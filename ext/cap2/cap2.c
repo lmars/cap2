@@ -8,6 +8,8 @@ static VALUE cap2_getpcaps(VALUE self, VALUE pid) {
   char *caps;
   VALUE result;
 
+  Check_Type(pid, T_FIXNUM);
+
   cap_d = cap_get_pid(NUM2INT(pid));
 
   if (cap_d == NULL) {
