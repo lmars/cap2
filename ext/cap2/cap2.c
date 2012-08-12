@@ -10,13 +10,13 @@ static VALUE cap2_getpcaps(VALUE self, VALUE pid) {
 
   Check_Type(pid, T_FIXNUM);
 
-  cap_d = cap_get_pid(NUM2INT(pid));
+  cap_d = cap_get_pid(FIX2INT(pid));
 
   if (cap_d == NULL) {
     rb_raise(
       rb_eRuntimeError,
       "Failed to get cap's for proccess %d: (%s)\n",
-      NUM2INT(pid), strerror(errno)
+      FIX2INT(pid), strerror(errno)
     );
   } else {
     caps = cap_to_text(cap_d, &length);
