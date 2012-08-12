@@ -15,7 +15,7 @@ static VALUE cap2_getpcaps(VALUE self, VALUE pid) {
   if (cap_d == NULL) {
     rb_raise(
       rb_eRuntimeError,
-      "Failed to get cap's for proccess %d: (%s)\n",
+      "Failed to get capabilities for proccess %d: (%s)\n",
       FIX2INT(pid), strerror(errno)
     );
   } else {
