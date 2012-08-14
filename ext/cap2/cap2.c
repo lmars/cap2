@@ -2,11 +2,9 @@
 #include <errno.h>
 #include <sys/capability.h>
 
-static VALUE cap2_getpcaps(VALUE self, VALUE pid) {
+static VALUE cap2_has_cap(VALUE self, VALUE pid, VALUE set, VALUE cap) {
   cap_t cap_d;
-  ssize_t length;
-  char *caps;
-  VALUE result;
+  cap_flag_value_t flag_value;
 
   Check_Type(pid, T_FIXNUM);
 
@@ -19,13 +17,17 @@ static VALUE cap2_getpcaps(VALUE self, VALUE pid) {
       FIX2INT(pid), strerror(errno)
     );
   } else {
-    caps = cap_to_text(cap_d, &length);
-    result = rb_str_new(caps, length);
-    cap_free(caps);
+    cap_get_flag(
+      cap_d,
+      (cap_value_t) cap,
+      (cap_flag_t) set,
+      &flag_value
+    );
+
     cap_free(cap_d);
   }
 
-  return result;
+  return flag_value == CAP_SET ? Qtrue : Qfalse;
 }
 
 void Init_cap2(void) {
@@ -33,5 +35,9 @@ void Init_cap2(void) {
 
   rb_mCap2 = rb_define_module("Cap2");
 
-  rb_define_module_function(rb_mCap2, "getpcaps", cap2_getpcaps, 1);
+  rb_define_const(rb_mCap2, "PERMITTED", CAP_PERMITTED);
+
+  rb_define_const(rb_mCap2, "DAC_OVERRIDE", CAP_DAC_OVERRIDE);
+
+  rb_define_module_function(rb_mCap2, "has_capability?", cap2_has_cap, 3);
 }
