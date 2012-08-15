@@ -7,6 +7,10 @@ module Cap2
     def effective?(capability)
       Cap2.has_capability?(@entity_id, Cap2::EFFECTIVE, capability)
     end
+
+    def inheritable?(capability)
+      Cap2.has_capability?(@entity_id, Cap2::INHERITABLE, capability)
+    end
   end
 end
 

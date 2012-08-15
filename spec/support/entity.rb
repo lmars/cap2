@@ -25,4 +25,14 @@ shared_examples_for 'an entity' do
       subject.effective?(capability)
     end
   end
+
+  describe '#inheritable?' do
+    it 'should call Cap2.has_capability? correctly' do
+      Cap2.
+        should_receive(:has_capability?).
+        with(entity_id, Cap2::INHERITABLE, capability)
+
+      subject.inheritable?(capability)
+    end
+  end
 end
