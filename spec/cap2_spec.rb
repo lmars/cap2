@@ -32,4 +32,36 @@ describe Cap2 do
       end
     end
   end
+
+  describe '.process' do
+    let(:process) { double 'process' }
+
+    before(:each) do
+      Cap2::Process.stub(:new => process)
+    end
+
+    context 'called without a pid' do
+      it 'should initialize a Cap2::Process with the current pid' do
+        Cap2::Process.should_receive(:new).with(Process.pid)
+        Cap2.process
+      end
+
+      it 'should return the new Cap2::Process' do
+        Cap2.process.should == process
+      end
+    end
+
+    context 'called with a pid' do
+      let(:pid) { double 'pid' }
+
+      it 'should initialize a Cap2::Process with the pid' do
+        Cap2::Process.should_receive(:new).with(pid)
+        Cap2.process(pid)
+      end
+
+      it 'should return the new Cap2::Process' do
+        Cap2.process(pid).should == process
+      end
+    end
+  end
 end
