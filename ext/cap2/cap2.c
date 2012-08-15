@@ -6,6 +6,7 @@ static VALUE cap2_has_cap(VALUE self, VALUE pid_or_filename, VALUE set, VALUE ca
   cap_t cap_d;
   cap_flag_value_t flag_value = CAP_CLEAR;
   char *set_s;
+  char *cap_s;
 
   if(TYPE(pid_or_filename) == T_FIXNUM) {
     int pid = FIX2INT(pid_or_filename);
@@ -56,6 +57,20 @@ static VALUE cap2_has_cap(VALUE self, VALUE pid_or_filename, VALUE set, VALUE ca
       set_s
     );
 
+  Check_Type(cap, T_SYMBOL);
+
+  cap = rb_sym_to_s(cap);
+  cap_s = StringValueCStr(cap);
+
+  if(strcmp(cap_s, "dac_override") == 0)
+    cap = CAP_DAC_OVERRIDE;
+  else
+    rb_raise(
+      rb_eArgError,
+      "wrong capability type, expected one of :dac_override, got :%s\n",
+      cap_s
+    );
+
   cap_get_flag(
     cap_d,
     (cap_value_t) cap,
@@ -72,8 +87,6 @@ void Init_cap2(void) {
   VALUE rb_mCap2;
 
   rb_mCap2 = rb_define_module("Cap2");
-
-  rb_define_const(rb_mCap2, "DAC_OVERRIDE", CAP_DAC_OVERRIDE);
 
   rb_define_module_function(rb_mCap2, "has_capability?", cap2_has_cap, 3);
 }
