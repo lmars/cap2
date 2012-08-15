@@ -14,8 +14,6 @@ module Cap2
 
     private
     def has?(set, cap)
-      set = Cap2.const_get(set.to_s.upcase)
-
       Cap2.has_capability?(@entity_id, set, cap)
     end
   end

@@ -5,6 +5,7 @@
 static VALUE cap2_has_cap(VALUE self, VALUE pid_or_filename, VALUE set, VALUE cap) {
   cap_t cap_d;
   cap_flag_value_t flag_value = CAP_CLEAR;
+  char *set_s;
 
   if(TYPE(pid_or_filename) == T_FIXNUM) {
     int pid = FIX2INT(pid_or_filename);
@@ -37,6 +38,24 @@ static VALUE cap2_has_cap(VALUE self, VALUE pid_or_filename, VALUE set, VALUE ca
     );
   }
 
+  Check_Type(set, T_SYMBOL);
+
+  set = rb_sym_to_s(set);
+  set_s = StringValueCStr(set);
+
+  if(strcmp(set_s, "permitted") == 0)
+    set = CAP_PERMITTED;
+  else if(strcmp(set_s, "effective") == 0)
+    set = CAP_EFFECTIVE;
+  else if(strcmp(set_s, "inheritable") == 0)
+    set = CAP_INHERITABLE;
+  else
+    rb_raise(
+      rb_eArgError,
+      "wrong set type, expected one of :permitted, :effective, :inheritable, got :%s\n",
+      set_s
+    );
+
   cap_get_flag(
     cap_d,
     (cap_value_t) cap,
@@ -53,10 +72,6 @@ void Init_cap2(void) {
   VALUE rb_mCap2;
 
   rb_mCap2 = rb_define_module("Cap2");
-
-  rb_define_const(rb_mCap2, "PERMITTED",    CAP_PERMITTED);
-  rb_define_const(rb_mCap2, "EFFECTIVE",    CAP_EFFECTIVE);
-  rb_define_const(rb_mCap2, "INHERITABLE",  CAP_INHERITABLE);
 
   rb_define_const(rb_mCap2, "DAC_OVERRIDE", CAP_DAC_OVERRIDE);
 
