@@ -55,6 +55,7 @@ void Init_cap2(void) {
   rb_mCap2 = rb_define_module("Cap2");
 
   rb_define_const(rb_mCap2, "PERMITTED", CAP_PERMITTED);
+  rb_define_const(rb_mCap2, "EFFECTIVE", CAP_EFFECTIVE);
 
   rb_define_const(rb_mCap2, "DAC_OVERRIDE", CAP_DAC_OVERRIDE);
 

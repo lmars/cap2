@@ -15,4 +15,14 @@ shared_examples_for 'an entity' do
       subject.permitted?(capability)
     end
   end
+
+  describe '#effective?' do
+    it 'should call Cap2.has_capability? correctly' do
+      Cap2.
+        should_receive(:has_capability?).
+        with(entity_id, Cap2::EFFECTIVE, capability)
+
+      subject.effective?(capability)
+    end
+  end
 end
