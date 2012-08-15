@@ -1,4 +1,5 @@
 require 'cap2.so'
+require 'cap2/entity'
 require 'cap2/process'
 require 'cap2/file'
 

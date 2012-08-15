@@ -1,11 +1,7 @@
 module Cap2
-  class Process
+  class Process < Entity
     def initialize(pid)
-      @pid = pid
-    end
-
-    def permitted?(capability)
-      Cap2.has_capability?(@pid, Cap2::PERMITTED, capability)
+      @entity_id = pid
     end
   end
 end
