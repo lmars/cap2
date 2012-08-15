@@ -54,13 +54,30 @@ describe Cap2 do
     context 'called with a pid' do
       let(:pid) { double 'pid' }
 
-      it 'should initialize a Cap2::Process with the pid' do
-        Cap2::Process.should_receive(:new).with(pid)
-        Cap2.process(pid)
+      context "when a process with the given pid doesn't exist" do
+        before(:each) do
+          Process.stub(:kill).with(0, pid).and_raise(Errno::ESRCH)
+        end
+
+        it 'should raise a Cap2::ProcessNotFound' do
+          expect { Cap2.process(pid) }.to \
+            raise_error(Cap2::ProcessNotFound)
+        end
       end
 
-      it 'should return the new Cap2::Process' do
-        Cap2.process(pid).should == process
+      context 'when a process with the given pid does exist' do
+        before(:each) do
+          Process.stub(:kill).with(0, pid).and_return(1)
+        end
+
+        it 'should initialize a Cap2::Process with the pid' do
+          Cap2::Process.should_receive(:new).with(pid)
+          Cap2.process(pid)
+        end
+
+        it 'should return the new Cap2::Process' do
+          Cap2.process(pid).should == process
+        end
       end
     end
   end
