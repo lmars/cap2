@@ -1,5 +1,6 @@
 require 'cap2.so'
 require 'cap2/process'
+require 'cap2/file'
 
 module Cap2
   class << self
@@ -7,6 +8,12 @@ module Cap2
       check_pid! pid
 
       Process.new(pid)
+    end
+
+    def file(filename)
+      check_file! filename
+
+      File.new(filename)
     end
 
     private
@@ -17,7 +24,14 @@ module Cap2
         raise ProcessNotFound
       end
     end
+
+    def check_file!(filename)
+      unless ::File.exists?(filename)
+        raise FileNotFound
+      end
+    end
   end
 
   class ProcessNotFound < StandardError; end
+  class FileNotFound < StandardError; end
 end
