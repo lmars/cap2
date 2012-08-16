@@ -3,6 +3,35 @@ Cap2
 
 Cap2 is a Ruby library for managing the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. See capabilites(7) for more information.
 
+Installation
+------------
+
+To install this library, you will need to be running Linux and have the libcap2 library and header files installed.
+
+### Install libcap2
+
+#### Ubuntu
+
+```
+$ sudo apt-get install libcap2 libcap-dev
+```
+
+#### From source
+
+```
+$ curl -O http://ftp.de.debian.org/debian/pool/main/libc/libcap2/libcap2_2.22.orig.tar.gz
+$ tar xzf libcap2_2.22.orig.tar.gz
+$ cd libcap2-2.22
+$ make
+$ sudo make install
+```
+
+### Install the gem
+
+```
+$ gem install cap2
+```
+
 Querying Capabilities
 ---------------------
 
