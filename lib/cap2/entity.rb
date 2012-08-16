@@ -1,5 +1,15 @@
 module Cap2
   class Entity
+    # = Entity
+    #
+    # A superclass for the Cap2::Process and Cap2::File
+    # classes providing convenience methods for querying
+    # permitted, effective and inheritable capabilities.
+    #
+    # Each method takes a capability argument, a lower
+    # cased name of a capability, without the 'CAP_' prefix.
+    # For example, :chown would query the CAP_CHOWN capability.
+
     def permitted?(capability)
       has?(:permitted, capability)
     end
