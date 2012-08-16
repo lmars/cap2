@@ -5,6 +5,20 @@ require 'cap2/file'
 
 module Cap2
   class << self
+    def has_capability?(pid_or_filename, set, cap)
+      set = SETS[set.to_s]
+      cap = CAPS[cap.to_s]
+
+      case pid_or_filename
+      when Fixnum
+        pid_has_cap?(pid_or_filename, set, cap)
+      when String
+        file_has_cap?(pid_or_filename, set, cap)
+      else
+        raise ArgumentError, "wrong argument type, expected Fixnum or String, got #{pid_or_filename.class}"
+      end
+    end
+
     def process(pid = ::Process.pid)
       check_pid! pid
 
