@@ -88,7 +88,42 @@ void Init_cap2(void) {
   rb_define_const(rb_mCap2, "SETS", sets_hash);
 
   caps_hash = rb_hash_new();
-  CapsHashSet("dac_override", CAP_DAC_OVERRIDE);
+  CapsHashSet("chown",            CAP_CHOWN);
+  CapsHashSet("dac_override",     CAP_DAC_OVERRIDE);
+  CapsHashSet("dac_read_search",  CAP_DAC_READ_SEARCH);
+  CapsHashSet("fowner",           CAP_FOWNER);
+  CapsHashSet("fsetid",           CAP_FSETID);
+  CapsHashSet("kill",             CAP_KILL);
+  CapsHashSet("setgid",           CAP_SETGID);
+  CapsHashSet("setuid",           CAP_SETUID);
+  CapsHashSet("setpcap",          CAP_SETPCAP);
+  CapsHashSet("linux_immutable",  CAP_LINUX_IMMUTABLE);
+  CapsHashSet("net_bind_service", CAP_NET_BIND_SERVICE);
+  CapsHashSet("net_broadcast",    CAP_NET_BROADCAST);
+  CapsHashSet("net_admin",        CAP_NET_ADMIN);
+  CapsHashSet("net_raw",          CAP_NET_RAW);
+  CapsHashSet("ipc_lock",         CAP_IPC_LOCK);
+  CapsHashSet("ipc_owner",        CAP_IPC_OWNER);
+  CapsHashSet("sys_module",       CAP_SYS_MODULE);
+  CapsHashSet("sys_rawio",        CAP_SYS_RAWIO);
+  CapsHashSet("sys_chroot",       CAP_SYS_CHROOT);
+  CapsHashSet("sys_ptrace",       CAP_SYS_PTRACE);
+  CapsHashSet("sys_pacct",        CAP_SYS_PACCT);
+  CapsHashSet("sys_admin",        CAP_SYS_ADMIN);
+  CapsHashSet("sys_boot",         CAP_SYS_BOOT);
+  CapsHashSet("sys_nice",         CAP_SYS_NICE);
+  CapsHashSet("sys_resource",     CAP_SYS_RESOURCE);
+  CapsHashSet("sys_time",         CAP_SYS_TIME);
+  CapsHashSet("sys_tty_config",   CAP_SYS_TTY_CONFIG);
+  CapsHashSet("mknod",            CAP_MKNOD);
+  CapsHashSet("lease",            CAP_LEASE);
+  CapsHashSet("audit_write",      CAP_AUDIT_WRITE);
+  CapsHashSet("audit_control",    CAP_AUDIT_CONTROL);
+  CapsHashSet("setfcap",          CAP_SETFCAP);
+  CapsHashSet("mac_override",     CAP_MAC_OVERRIDE);
+  CapsHashSet("mac_admin",        CAP_MAC_ADMIN);
+  CapsHashSet("syslog",           CAP_SYSLOG);
+  CapsHashSet("wake_alarm",       CAP_WAKE_ALARM);
   rb_define_const(rb_mCap2, "CAPS", caps_hash);
 
   rb_define_module_function(
