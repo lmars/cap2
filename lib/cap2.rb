@@ -29,6 +29,7 @@ module Cap2
     #   prefix. For example, :chown would query the CAP_CHOWN
     #   capability
     def has_capability?(pid_or_filename, set, cap)
+      # See ext/cap2/cap2.c for the definition of SETS and CAPS
       set = SETS[set.to_s]
       cap = CAPS[cap.to_s]
 

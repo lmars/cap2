@@ -77,7 +77,14 @@ static VALUE cap2_file_has_cap(VALUE self, VALUE filename, VALUE set, VALUE cap)
   rb_hash_aset(caps_hash, rb_str_new2(key), INT2FIX(val))
 
 void Init_cap2(void) {
-  VALUE rb_mCap2, sets_hash, caps_hash;
+  VALUE rb_mCap2;
+
+  // sets_hash and caps_hash act as maps between lower cased
+  // names of capabilities (e.g. 'dac_override') and the CAP_
+  // constants defined in linux/capability.h and
+  // sys/capability.h (e.g. CAP_DAC_OVERRIDE). They are
+  // assigned to Cap2::SETS and Cap2::CAPS respectively.
+  VALUE sets_hash, caps_hash;
 
   rb_mCap2 = rb_define_module("Cap2");
 
