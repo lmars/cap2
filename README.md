@@ -1,7 +1,7 @@
 Cap2
 ====
 
-Cap2 is a Ruby library for managing Linux process and file capabilities
+Cap2 is a Ruby library for managing the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. See capabilites(7) for more information.
 
 Querying Capabilities
 ---------------------
