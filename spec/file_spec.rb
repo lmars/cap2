@@ -46,5 +46,17 @@ describe Cap2::File do
       it { should be_inheritable(:dac_override) }
     end
   end
-end
 
+  describe '#permit' do
+    let(:permitting_fowner_on_the_file) do
+      # FIXME: Would like to use `subject.permit(:fowner)` but this would
+      #        require the test suite to be run as root?
+      lambda { system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").permit(:fowner)'} }
+    end
+
+    specify do
+      expect(&permitting_fowner_on_the_file).to \
+        change { subject.permitted?(:fowner) }.from(false).to(true)
+    end
+  end
+end

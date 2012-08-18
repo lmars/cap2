@@ -128,6 +128,36 @@ static VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
   return result;
 }
 
+static VALUE cap2_file_permit(VALUE self, VALUE cap_sym) {
+  cap_t cap_d;
+  char *fname;
+  VALUE filename;
+  int result;
+  cap_value_t caps_to_set[1];
+
+  filename = rb_iv_get(self, "@filename");
+  fname = StringValueCStr(filename);
+
+  caps_to_set[0] = cap2_sym_to_cap(cap_sym);
+
+  cap_d = cap_get_file(fname);
+
+  if(cap_d == NULL)
+    cap_d = cap_init();
+
+  cap_set_flag(cap_d, CAP_PERMITTED, 1, caps_to_set, CAP_SET);
+
+  if(cap_set_file(fname, cap_d) == -1) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to set capabilities for file %s: (%s)\n",
+      fname, strerror(errno)
+    );
+  } else {
+    return Qtrue;
+  }
+}
+
 void Init_cap2(void) {
   VALUE rb_mCap2;
   VALUE rb_cCap2File;
@@ -140,4 +170,5 @@ void Init_cap2(void) {
 
   rb_cCap2File = rb_define_class_under(rb_mCap2, "File", rb_cObject);
   rb_define_method(rb_cCap2File, "has?", cap2_file_has_cap, 2);
+  rb_define_method(rb_cCap2File, "permit", cap2_file_permit, 1);
 }
