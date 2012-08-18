@@ -1,8 +1,8 @@
 module Cap2
-  class Entity
-    # = Entity
+  module SetMethods
+    # = SetMethods
     #
-    # A superclass for the Cap2::Process and Cap2::File
+    # A mixin for the Cap2::Process and Cap2::File
     # classes providing convenience methods for querying
     # permitted, effective and inheritable capabilities.
     #
@@ -20,11 +20,6 @@ module Cap2
 
     def inheritable?(capability)
       has?(:inheritable, capability)
-    end
-
-    private
-    def has?(set, cap)
-      Cap2.has_capability?(@entity_id, set, cap)
     end
   end
 end
