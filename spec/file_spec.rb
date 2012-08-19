@@ -72,6 +72,17 @@ describe Cap2::File do
     end
   end
 
+  describe '#disallow_inherit' do
+    before(:each) do
+      run_as_root('allow_inherit(:chown)')
+    end
+
+    specify do
+      expect { running_as_root('disallow_inherit(:chown)') }.to \
+        change { subject.inheritable?(:chown) }.from(true).to(false)
+    end
+  end
+
   # FIXME: Would like to call the given code on subject directly (e.g.
   #        `subject.permit(:fowner)`) but this would require the test
   #        suite to be run as root?
