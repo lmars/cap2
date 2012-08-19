@@ -1,0 +1,1001 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cap2::File
+  
+    &mdash; Documentation by YARD 0.8.2.1
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '../';
+  framesUrl = "../frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (F)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Cap2.html" title="Cap2 (module)">Cap2</a></span></span>
+     &raquo; 
+    <span class="title">File</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="../method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="../file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><h1>Class: Cap2::File
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Cap2::File</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2"><span class='object_link'><a href="SetMethods.html" title="Cap2::SetMethods (module)">SetMethods</a></span></dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">lib/cap2/file.rb<span class="defines">,<br />
+  ext/cap2/cap2.c</span>
+</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>A class with methods for querying capabilities for the file with filename
+provided to the initialize method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#allow_inherit-instance_method" title="#allow_inherit (instance method)">- (Boolean) <strong>allow_inherit</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Allow processes executing this file to inherit the given capability.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disable_on_exec-instance_method" title="#disable_on_exec (instance method)">- (Boolean) <strong>disable_on_exec</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Dont enable the given capability when a process executes this file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disallow_inherit-instance_method" title="#disallow_inherit (instance method)">- (Boolean) <strong>disallow_inherit</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Dont allow processes executing this file to inherit the given capability.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enable_on_exec-instance_method" title="#enable_on_exec (instance method)">- (Object) <strong>enable_on_exec</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Enable the given capability in the file's effective set.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#has%3F-instance_method" title="#has? (instance method)">- (Boolean) <strong>has?</strong>(set, capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Return whether the file has the given capability enabled in the given set.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (File) <strong>initialize</strong>(filename) </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Initialize a new File object for the given filename.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#permit-instance_method" title="#permit (instance method)">- (Boolean) <strong>permit</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Permit processes executing this file to enable the given capability.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_effective-instance_method" title="#set_effective (instance method)">- (Boolean) <strong>set_effective</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Enable the given capability when a proces executes this file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unpermit-instance_method" title="#unpermit (instance method)">- (Boolean) <strong>unpermit</strong>(capability) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Dont permit processes executing ths file to enable the given capability.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="SetMethods.html" title="Cap2::SetMethods (module)">SetMethods</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="SetMethods.html#effective%3F-instance_method" title="Cap2::SetMethods#effective? (method)">#effective?</a></span>, <span class='object_link'><a href="SetMethods.html#inheritable%3F-instance_method" title="Cap2::SetMethods#inheritable? (method)">#inheritable?</a></span>, <span class='object_link'><a href="SetMethods.html#permitted%3F-instance_method" title="Cap2::SetMethods#permitted? (method)">#permitted?</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Cap2::File (class)">File</a></span></tt>) <strong>initialize</strong>(filename) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Initialize a new File object for the given filename.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cap2/file.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_filename'>filename</span><span class='rparen'>)</span>
+  <span class='ivar'>@filename</span> <span class='op'>=</span> <span class='id identifier rubyid_filename'>filename</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="allow_inherit-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>allow_inherit</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Allow processes executing this file to inherit the given capability.</p>
+
+<pre class="code"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/foo</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>      <span class='comment'>#=&gt; &lt;Cap2::File&gt;
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>          <span class='comment'>#=&gt; false
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_allow_inherit'>allow_inherit</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>         <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>          <span class='comment'>#=&gt; true</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+349
+350
+351</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 349</span>
+
+VALUE cap2_file_allow_inherit(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_INHERITABLE, cap_sym, CAP_SET);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disable_on_exec-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>disable_on_exec</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Dont enable the given capability when a process executes this file.</p>
+
+<pre class="code"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/foo</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>      <span class='comment'>#=&gt; &lt;Cap2::File&gt;
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>            <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_disable_on_exec'>disable_on_exec</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>       <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>            <span class='comment'>#=&gt; false</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+394
+395
+396</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 394</span>
+
+VALUE cap2_file_clear_effective(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_CLEAR);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disallow_inherit-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>disallow_inherit</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Dont allow processes executing this file to inherit the given capability.</p>
+
+<pre class="code"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/foo</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>      <span class='comment'>#=&gt; &lt;Cap2::File&gt;
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>          <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_allow_inherit'>allow_inherit</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>         <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>          <span class='comment'>#=&gt; false</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+364
+365
+366</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 364</span>
+
+VALUE cap2_file_disallow_inherit(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_INHERITABLE, cap_sym, CAP_CLEAR);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="enable_on_exec-instance_method">
+  
+    - (<tt>Object</tt>) <strong>enable_on_exec</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Enable the given capability in the file's effective set.</p>
+
+<p>The capability must be either permitted or inheritable (or else it cannot
+possibly be enabled in the new process).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+18
+19
+20
+21
+22
+23
+24</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cap2/file.rb', line 18</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enable_on_exec'>enable_on_exec</span><span class='lparen'>(</span><span class='id identifier rubyid_capability'>capability</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='id identifier rubyid_capability'>capability</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='id identifier rubyid_capability'>capability</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_set_effective'>set_effective</span><span class='lparen'>(</span><span class='id identifier rubyid_capability'>capability</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>IncompatibleCapabilities</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>cannot enable_on_exec a capability which is neither permitted nor inheritable</span><span class='tstring_end'>'</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="has?-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>has?</strong>(set, capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Return whether the file has the given capability enabled in the given set.</p>
+
+<pre class="code"><code><span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/bin/ping</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_has?'>has?</span><span class='lparen'>(</span><span class='symbol'>:permitted</span><span class='comma'>,</span> <span class='symbol'>:net_raw</span><span class='rparen'>)</span>    <span class='comment'>#=&gt; true
+</span><span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/ping</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_has?'>has?</span><span class='lparen'>(</span><span class='symbol'>:permitted</span><span class='comma'>,</span> <span class='symbol'>:net_raw</span><span class='rparen'>)</span>    <span class='comment'>#=&gt; false</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 294</span>
+
+VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
+  cap_t cap_d;
+  VALUE result;
+
+  cap_d = cap2_file_caps(self);
+
+  result = cap2_has_cap(cap_d, set_sym, cap_sym);
+
+  cap_free(cap_d);
+
+  return result;
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="permit-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>permit</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Permit processes executing this file to enable the given capability.</p>
+
+<pre class="code"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/killer</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>    <span class='comment'>#=&gt; &lt;Cap2::File&gt;
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>             <span class='comment'>#=&gt; false
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permit'>permit</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>                 <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>             <span class='comment'>#=&gt; true</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+318
+319
+320</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 318</span>
+
+VALUE cap2_file_permit(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_PERMITTED, cap_sym, CAP_SET);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_effective-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>set_effective</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Enable the given capability when a proces executes this file.</p>
+
+<pre class="code"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/foo</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>      <span class='comment'>#=&gt; &lt;Cap2::File&gt;
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>            <span class='comment'>#=&gt; false
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_set_effective'>set_effective</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>         <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>            <span class='comment'>#=&gt; true</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+379
+380
+381</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 379</span>
+
+VALUE cap2_file_set_effective(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_SET);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unpermit-instance_method">
+  
+    - (<tt>Boolean</tt>) <strong>unpermit</strong>(capability) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Dont permit processes executing ths file to enable the given capability.</p>
+
+<pre class="code"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/foo</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>      <span class='comment'>#=&gt; &lt;Cap2::File&gt;
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permit'>permit</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>                <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>            <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_unpermit'>unpermit</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>              <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:kill</span><span class='rparen'>)</span>            <span class='comment'>#=&gt; false</span></code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+334
+335
+336</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'ext/cap2/cap2.c', line 334</span>
+
+VALUE cap2_file_unpermit(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_PERMITTED, cap_sym, CAP_CLEAR);
+}</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+    <div id="footer">
+  Generated on Sun Aug 19 20:19:54 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.2.1 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>

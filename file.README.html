@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.2.1
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!" + escape(window.location.href);
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><h1>Cap2</h1>
+
+<p>Cap2 is a Ruby library for managing the POSIX 1003.1e capabilities available in Linux kernels. These capabilities are a partitioning of the all powerful root privilege into a set of distinct privileges. See capabilites(7) for more information.</p>
+
+<h2>Installation</h2>
+
+<p>To install this library, you will need to be running Linux and have the libcap2 library and header files installed.</p>
+
+<h3>Install libcap2</h3>
+
+<h4>Ubuntu</h4>
+
+<pre class="code ruby"><code>$ sudo apt-get install libcap2 libcap-dev
+</code></pre>
+
+<h4>From source</h4>
+
+<pre class="code ruby"><code>$ curl -O http://ftp.de.debian.org/debian/pool/main/libc/libcap2/libcap2_2.22.orig.tar.gz
+$ tar xzf libcap2_2.22.orig.tar.gz
+$ cd libcap2-2.22
+$ make
+$ sudo make install
+</code></pre>
+
+<h3>Install the gem</h3>
+
+<pre class="code ruby"><code>$ gem install cap2
+</code></pre>
+
+<h2>Querying Capabilities</h2>
+
+<h3>Processes</h3>
+
+<p>Suppose a process with pid 1000 exists with the following capabilities:</p>
+
+<pre class="code ruby"><code>Permitted   - CAP_CHOWN, CAP_LEASE
+Effective   - CAP_CHOWN
+Inheritable - CAP_LEASE
+</code></pre>
+
+<p>Then:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_process'>process</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_process'>process</span><span class='lparen'>(</span><span class='int'>1000</span><span class='rparen'>)</span>  <span class='comment'># =&gt; #&lt;Cap2::Process&gt;
+</span>
+<span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:chown</span><span class='rparen'>)</span>    <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:lease</span><span class='rparen'>)</span>    <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:fowner</span><span class='rparen'>)</span>   <span class='comment'># =&gt; false
+</span>
+<span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:chown</span><span class='rparen'>)</span>    <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:lease</span><span class='rparen'>)</span>    <span class='comment'># =&gt; false
+</span>
+<span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:chown</span><span class='rparen'>)</span>  <span class='comment'># =&gt; false
+</span><span class='id identifier rubyid_process'>process</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:lease</span><span class='rparen'>)</span>  <span class='comment'># =&gt; true
+</span></code></pre>
+
+<h3>Files</h3>
+
+<p>Suppose the file &quot;/tmp/cap_test&quot; exists with the following capabilities:</p>
+
+<pre class="code ruby"><code>Permitted   - CAP_CHOWN, CAP_LEASE
+Effective   - CAP_CHOWN
+Inheritable - CAP_LEASE
+</code></pre>
+
+<p>Then:</p>
+
+<pre class="code ruby"><code><span class='id identifier rubyid_file'>file</span> <span class='op'>=</span> <span class='const'>Cap2</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>/tmp/cap_test</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>  <span class='comment'># =&gt; #&lt;Cap2::File&gt;
+</span>
+<span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:chown</span><span class='rparen'>)</span>            <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:lease</span><span class='rparen'>)</span>            <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_permitted?'>permitted?</span><span class='lparen'>(</span><span class='symbol'>:fowner</span><span class='rparen'>)</span>           <span class='comment'># =&gt; false
+</span>
+<span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:chown</span><span class='rparen'>)</span>            <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_effective?'>effective?</span><span class='lparen'>(</span><span class='symbol'>:lease</span><span class='rparen'>)</span>            <span class='comment'># =&gt; false
+</span>
+<span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:chown</span><span class='rparen'>)</span>          <span class='comment'># =&gt; false
+</span><span class='id identifier rubyid_file'>file</span><span class='period'>.</span><span class='id identifier rubyid_inheritable?'>inheritable?</span><span class='lparen'>(</span><span class='symbol'>:lease</span><span class='rparen'>)</span>          <span class='comment'># =&gt; true
+</span></code></pre>
+</div></div>
+
+    <div id="footer">
+  Generated on Sun Aug 19 20:19:54 2012 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.2.1 (ruby-1.9.3).
+</div>
+
+  </body>
+</html>
