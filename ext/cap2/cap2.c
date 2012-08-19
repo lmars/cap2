@@ -1,8 +1,6 @@
-#include <ruby.h>
-#include <errno.h>
-#include <sys/capability.h>
+#include "cap2.h"
 
-static cap_flag_t cap2_sym_to_set(VALUE set) {
+cap_flag_t cap2_sym_to_set(VALUE set) {
   char *set_s;
 
   Check_Type(set, T_SYMBOL);
@@ -17,7 +15,7 @@ static cap_flag_t cap2_sym_to_set(VALUE set) {
   else rb_raise(rb_eArgError, "unknown set %s", set_s);
 }
 
-static cap_value_t cap2_sym_to_cap(VALUE cap) {
+cap_value_t cap2_sym_to_cap(VALUE cap) {
   char *cap_s;
 
   Check_Type(cap, T_SYMBOL);
@@ -65,7 +63,7 @@ static cap_value_t cap2_sym_to_cap(VALUE cap) {
   else rb_raise(rb_eArgError, "unknown capability %s", cap_s);
 }
 
-static VALUE cap2_has_cap(cap_t cap_d, VALUE set_sym, VALUE cap_sym) {
+VALUE cap2_has_cap(cap_t cap_d, VALUE set_sym, VALUE cap_sym) {
   cap_flag_t set;
   cap_value_t cap;
   cap_flag_value_t flag_value = CAP_CLEAR;
@@ -101,74 +99,6 @@ static VALUE cap2_process_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
   cap_free(cap_d);
 
   return result;
-}
-
-static char *cap2_file_filename(VALUE file) {
-  VALUE filename;
-
-  filename = rb_iv_get(file, "@filename");
-
-  return StringValueCStr(filename);
-}
-
-static cap_t cap2_file_caps(VALUE file) {
-  cap_t cap_d;
-  char *filename;
-
-  filename = cap2_file_filename(file);
-
-  cap_d = cap_get_file(filename);
-
-  if (cap_d == NULL && errno != ENODATA) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to get capabilities for file %s: (%s)\n",
-      filename, strerror(errno)
-    );
-  }
-
-  return cap_d;
-}
-
-static VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
-  cap_t cap_d;
-  VALUE result;
-
-  cap_d = cap2_file_caps(self);
-
-  result = cap2_has_cap(cap_d, set_sym, cap_sym);
-
-  cap_free(cap_d);
-
-  return result;
-}
-
-static VALUE cap2_file_permit(VALUE self, VALUE cap_sym) {
-  cap_t cap_d;
-  int result;
-  char *filename;
-  cap_value_t caps_to_set[1];
-
-  filename = cap2_file_filename(self);
-
-  caps_to_set[0] = cap2_sym_to_cap(cap_sym);
-
-  cap_d = cap_get_file(filename);
-
-  if(cap_d == NULL)
-    cap_d = cap_init();
-
-  cap_set_flag(cap_d, CAP_PERMITTED, 1, caps_to_set, CAP_SET);
-
-  if(cap_set_file(filename, cap_d) == -1) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to set capabilities for file %s: (%s)\n",
-      filename, strerror(errno)
-    );
-  } else {
-    return Qtrue;
-  }
 }
 
 void Init_cap2(void) {
