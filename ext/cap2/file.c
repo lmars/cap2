@@ -27,6 +27,33 @@ static cap_t cap2_file_caps(VALUE file) {
   return cap_d;
 }
 
+static VALUE cap2_file_set_cap(VALUE file, cap_flag_t set, VALUE cap_sym, cap_flag_value_t set_or_clear) {
+  cap_t cap_d;
+  char *filename;
+  cap_value_t caps[1];
+
+  filename = cap2_file_filename(file);
+
+  caps[0] = cap2_sym_to_cap(cap_sym);
+
+  cap_d = cap_get_file(filename);
+
+  if(cap_d == NULL)
+    cap_d = cap_init();
+
+  cap_set_flag(cap_d, set, 1, caps, set_or_clear);
+
+  if(cap_set_file(filename, cap_d) == -1) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to set capabilities for file %s: (%s)\n",
+      filename, strerror(errno)
+    );
+  } else {
+    return Qtrue;
+  }
+}
+
 VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
   cap_t cap_d;
   VALUE result;
@@ -41,57 +68,9 @@ VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
 }
 
 VALUE cap2_file_permit(VALUE self, VALUE cap_sym) {
-  cap_t cap_d;
-  int result;
-  char *filename;
-  cap_value_t caps_to_set[1];
-
-  filename = cap2_file_filename(self);
-
-  caps_to_set[0] = cap2_sym_to_cap(cap_sym);
-
-  cap_d = cap_get_file(filename);
-
-  if(cap_d == NULL)
-    cap_d = cap_init();
-
-  cap_set_flag(cap_d, CAP_PERMITTED, 1, caps_to_set, CAP_SET);
-
-  if(cap_set_file(filename, cap_d) == -1) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to set capabilities for file %s: (%s)\n",
-      filename, strerror(errno)
-    );
-  } else {
-    return Qtrue;
-  }
+  return cap2_file_set_cap(self, CAP_PERMITTED, cap_sym, CAP_SET);
 }
 
 VALUE cap2_file_unpermit(VALUE self, VALUE cap_sym) {
-  cap_t cap_d;
-  int result;
-  char *filename;
-  cap_value_t caps_to_clear[1];
-
-  filename = cap2_file_filename(self);
-
-  caps_to_clear[0] = cap2_sym_to_cap(cap_sym);
-
-  cap_d = cap_get_file(filename);
-
-  if(cap_d == NULL)
-    cap_d = cap_init();
-
-  cap_set_flag(cap_d, CAP_PERMITTED, 1, caps_to_clear, CAP_CLEAR);
-
-  if(cap_set_file(filename, cap_d) == -1) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to set capabilities for file %s: (%s)\n",
-      filename, strerror(errno)
-    );
-  } else {
-    return Qtrue;
-  }
+  return cap2_file_set_cap(self, CAP_PERMITTED, cap_sym, CAP_CLEAR);
 }
