@@ -89,4 +89,5 @@ void Init_cap2(void) {
   rb_cCap2File = rb_define_class_under(rb_mCap2, "File", rb_cObject);
   rb_define_method(rb_cCap2File, "has?", cap2_file_has_cap, 2);
   rb_define_method(rb_cCap2File, "permit", cap2_file_permit, 1);
+  rb_define_method(rb_cCap2File, "unpermit", cap2_file_unpermit, 1);
 }

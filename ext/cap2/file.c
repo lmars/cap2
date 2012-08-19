@@ -67,3 +67,31 @@ VALUE cap2_file_permit(VALUE self, VALUE cap_sym) {
     return Qtrue;
   }
 }
+
+VALUE cap2_file_unpermit(VALUE self, VALUE cap_sym) {
+  cap_t cap_d;
+  int result;
+  char *filename;
+  cap_value_t caps_to_clear[1];
+
+  filename = cap2_file_filename(self);
+
+  caps_to_clear[0] = cap2_sym_to_cap(cap_sym);
+
+  cap_d = cap_get_file(filename);
+
+  if(cap_d == NULL)
+    cap_d = cap_init();
+
+  cap_set_flag(cap_d, CAP_PERMITTED, 1, caps_to_clear, CAP_CLEAR);
+
+  if(cap_set_file(filename, cap_d) == -1) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to set capabilities for file %s: (%s)\n",
+      filename, strerror(errno)
+    );
+  } else {
+    return Qtrue;
+  }
+}
