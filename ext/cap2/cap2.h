@@ -1,5 +1,6 @@
 #include <ruby.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/capability.h>
 
 cap_flag_t cap2_sym_to_set(VALUE set);
@@ -15,3 +16,5 @@ VALUE cap2_file_set_effective(VALUE self, VALUE cap_sym);
 VALUE cap2_file_clear_effective(VALUE self, VALUE cap_sym);
 
 VALUE cap2_process_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym);
+VALUE cap2_process_enable(VALUE self, VALUE cap_sym);
+VALUE cap2_process_disable(VALUE self, VALUE cap_sym);
