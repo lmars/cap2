@@ -1,11 +1,8 @@
-# = Cap2::File
-#
-# A class with methods for querying capabilities for the
-# file with filename provided to the initialize method.
-
 require 'cap2/set_methods'
 
 module Cap2
+  # A class with methods for querying capabilities for the
+  # file with filename provided to the initialize method.
   class File
     include SetMethods
 

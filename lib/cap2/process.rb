@@ -1,11 +1,8 @@
-# = Cap2::Process
-#
-# A class with methods for querying capabilities for the
-# process with pid provided to the initialize method.
-
 require 'cap2/set_methods'
 
 module Cap2
+  # A class with methods for querying capabilities for the
+  # process with pid provided to the initialize method.
   class Process
     include SetMethods
 
