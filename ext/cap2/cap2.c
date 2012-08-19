@@ -92,4 +92,5 @@ void Init_cap2(void) {
   rb_define_method(rb_cCap2File, "unpermit", cap2_file_unpermit, 1);
   rb_define_method(rb_cCap2File, "allow_inherit", cap2_file_allow_inherit, 1);
   rb_define_method(rb_cCap2File, "disallow_inherit", cap2_file_disallow_inherit, 1);
+  rb_define_method(rb_cCap2File, "set_effective", cap2_file_set_effective, 1);
 }

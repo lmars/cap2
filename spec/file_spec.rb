@@ -83,6 +83,40 @@ describe Cap2::File do
     end
   end
 
+  describe '#enable_on_exec' do
+    context 'when the capability is not permitted or inheritable' do
+      specify do
+        expect { subject.enable_on_exec(:lease) }.to \
+          raise_error(
+            Cap2::IncompatibleCapabilities,
+            'cannot enable_on_exec a capability which is neither permitted nor inheritable'
+          )
+      end
+    end
+
+    context 'when the capability is permitted' do
+      before(:each) do
+        run_as_root('permit(:lease)')
+      end
+
+      specify do
+        expect { running_as_root('enable_on_exec(:lease)') }.to \
+          change { subject.effective?(:lease) }.from(false).to(true)
+      end
+    end
+
+    context 'when the capability is inheritable' do
+      before(:each) do
+        run_as_root('allow_inherit(:lease)')
+      end
+
+      specify do
+        expect { running_as_root('enable_on_exec(:lease)') }.to \
+          change { subject.effective?(:lease) }.from(false).to(true)
+      end
+    end
+  end
+
   # FIXME: Would like to call the given code on subject directly (e.g.
   #        `subject.permit(:fowner)`) but this would require the test
   #        suite to be run as root?

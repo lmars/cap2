@@ -12,5 +12,13 @@ module Cap2
     def initialize(filename)
       @filename = filename
     end
+
+    def enable_on_exec(capability)
+      if permitted?(capability) || inheritable?(capability)
+        set_effective(capability)
+      else
+        raise IncompatibleCapabilities, 'cannot enable_on_exec a capability which is neither permitted nor inheritable'
+      end
+    end
   end
 end

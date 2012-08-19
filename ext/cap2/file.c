@@ -82,3 +82,7 @@ VALUE cap2_file_allow_inherit(VALUE self, VALUE cap_sym) {
 VALUE cap2_file_disallow_inherit(VALUE self, VALUE cap_sym) {
   return cap2_file_set_cap(self, CAP_INHERITABLE, cap_sym, CAP_CLEAR);
 }
+
+VALUE cap2_file_set_effective(VALUE self, VALUE cap_sym) {
+  return cap2_file_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_SET);
+}

@@ -46,4 +46,5 @@ module Cap2
 
   class ProcessNotFound < StandardError; end
   class FileNotFound < StandardError; end
+  class IncompatibleCapabilities < StandardError; end
 end
