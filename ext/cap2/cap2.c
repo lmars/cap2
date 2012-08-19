@@ -91,6 +91,130 @@ VALUE cap2_has_cap(cap_t cap_d, VALUE set_sym, VALUE cap_sym) {
   return flag_value == CAP_SET ? Qtrue : Qfalse;
 }
 
+/*
+ * Convert @pid stored in the given Process object to an int and return it.
+ */
+static int cap2_process_pid(VALUE process) {
+  VALUE pid;
+
+  pid = rb_iv_get(process, "@pid");
+
+  return FIX2INT(pid);
+}
+
+/*
+ * Return a cap_t struct containing the capabilities of the given Process object.
+ */
+static cap_t cap2_process_caps(VALUE process) {
+  cap_t cap_d;
+  int pid;
+
+  pid = cap2_process_pid(process);
+
+  cap_d = cap_get_pid(pid);
+
+  if (cap_d == NULL) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to get capabilities for proccess %d: (%s)\n",
+      pid, strerror(errno)
+    );
+  }
+
+  return cap_d;
+}
+
+/*
+ * Enable/disable the given capability in the given set for the given Process
+ * object.
+ */
+static VALUE cap2_process_set_cap(VALUE process, cap_flag_t set, VALUE cap_sym, cap_flag_value_t set_or_clear) {
+  cap_t cap_d;
+  int pid;
+  cap_value_t caps[1];
+
+  pid = cap2_process_pid(process);
+
+  if((pid_t) pid != getpid())
+    rb_raise(
+      rb_eRuntimeError,
+      "Cannot set capabilities for other processes"
+    );
+
+  caps[0] = cap2_sym_to_cap(cap_sym);
+
+  cap_d = cap_get_pid(pid);
+
+  cap_set_flag(cap_d, set, 1, caps, set_or_clear);
+
+  if(cap_set_proc(cap_d) == -1) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to set capabilities for process %d: (%s)\n",
+      pid, strerror(errno)
+    );
+  } else {
+    return Qtrue;
+  }
+}
+
+/*
+ * call-seq:
+ *  has?(set, capability) -> true or false
+ *
+ * Return whether the process has the given capability enabled in the given set.
+ *
+ *   Cap2.process(1).has?(:permitted, :kill)    #=> true
+ *   Cap2.process(1000).has?(:permitted, :kill) #=> false
+ */
+VALUE cap2_process_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
+  cap_t cap_d;
+  VALUE result;
+
+  cap_d = cap2_process_caps(self);
+
+  result = cap2_has_cap(cap_d, set_sym, cap_sym);
+
+  cap_free(cap_d);
+
+  return result;
+}
+
+/*
+ * call-seq:
+ *  enable(capability) -> true or false
+ *
+ * Enable the given capability for this process.
+ *
+ * Raises a RuntimeError if the process's pid is not the same as the current
+ * pid (you cannot enable capabilities for other processes, that's their job).
+ *
+ *   process = Cap2.process              #=> <Cap2::Process>
+ *   process.permitted?(:kill)           #=> true
+ *   process.effective?(:kill)           #=> false
+ *   process.enable(:kill)               #=> true
+ *   process.effective?(:kill)           #=> true
+ */
+VALUE cap2_process_enable(VALUE self, VALUE cap_sym) {
+  return cap2_process_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_SET);
+}
+
+/*
+ * call-seq:
+ *  disable(capability) -> true or false
+ *
+ * Disable the given capability for this process.
+ *
+ *   process = Cap2.process              #=> <Cap2::Process>
+ *   process.permitted?(:kill)           #=> true
+ *   process.effective?(:kill)           #=> true
+ *   process.disable(:kill)              #=> true
+ *   process.effective?(:kill)           #=> false
+ */
+VALUE cap2_process_disable(VALUE self, VALUE cap_sym) {
+  return cap2_process_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_CLEAR);
+}
+
 void Init_cap2(void) {
   VALUE rb_mCap2;
   VALUE rb_cCap2File;
