@@ -1,5 +1,10 @@
 #include "cap2.h"
 
+/*
+ * Converts a Ruby symbol into cap_flag_t set, defined in <sys/capability.h>
+ *
+ * Raises an ArgumentError if set is not a valid capability set
+ */
 cap_flag_t cap2_sym_to_set(VALUE set) {
   char *set_s;
 
@@ -15,6 +20,12 @@ cap_flag_t cap2_sym_to_set(VALUE set) {
   else rb_raise(rb_eArgError, "unknown set %s", set_s);
 }
 
+/*
+ * Converts a Ruby symbol into cap_value_t capability value, defined
+ * in <linux/capability.h>
+ *
+ * Raises an ArgumentError if cap is not a valid capability value.
+ */
 cap_value_t cap2_sym_to_cap(VALUE cap) {
   char *cap_s;
 
@@ -63,6 +74,10 @@ cap_value_t cap2_sym_to_cap(VALUE cap) {
   else rb_raise(rb_eArgError, "unknown capability %s", cap_s);
 }
 
+/*
+ * Returns a boolean representing whether cap_d has the given capability enabled
+ * in the given set
+ */
 VALUE cap2_has_cap(cap_t cap_d, VALUE set_sym, VALUE cap_sym) {
   cap_flag_t set;
   cap_value_t cap;
