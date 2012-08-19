@@ -44,7 +44,12 @@ module Cap2
     end
   end
 
+  # Raised when trying to initialise a Process object for a non-existent pid.
   class ProcessNotFound < StandardError; end
+
+  # Raised when trying to initialise a File object for a non-existent file.
   class FileNotFound < StandardError; end
+
+  # Raised when trying to enable unpermitted / uninheritable file capabilities.
   class IncompatibleCapabilities < StandardError; end
 end
