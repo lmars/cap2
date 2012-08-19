@@ -48,32 +48,28 @@ describe Cap2::File do
   end
 
   describe '#permit' do
-    let(:permitting_fowner_on_the_file) do
-      # FIXME: Would like to use `subject.permit(:fowner)` but this would
-      #        require the test suite to be run as root?
-      lambda { system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").permit(:fowner)'} }
-    end
-
     specify do
-      expect(&permitting_fowner_on_the_file).to \
+      expect { running_as_root('permit(:fowner)') }.to \
         change { subject.permitted?(:fowner) }.from(false).to(true)
     end
   end
 
   describe '#unpermit' do
     before(:each) do
-      system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").permit(:fowner)'}
-    end
-
-    let(:unpermitting_fowner_on_the_file) do
-      # FIXME: Would like to use `subject.unpermit(:fowner)` but this would
-      #        require the test suite to be run as root?
-      lambda { system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").unpermit(:fowner)'} }
+      run_as_root('permit(:fowner)')
     end
 
     specify do
-      expect(&unpermitting_fowner_on_the_file).to \
+      expect { running_as_root('unpermit(:fowner)') }.to \
         change { subject.permitted?(:fowner) }.from(true).to(false)
     end
   end
+
+  # FIXME: Would like to call the given code on subject directly (e.g.
+  #        `subject.permit(:fowner)`) but this would require the test
+  #        suite to be run as root?
+  def run_as_root(code)
+    system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").#{code}'}
+  end
+  alias running_as_root run_as_root
 end
