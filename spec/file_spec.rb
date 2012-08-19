@@ -117,11 +117,24 @@ describe Cap2::File do
     end
   end
 
+  describe '#disable_on_exec' do
+    before(:each) do
+      run_as_root('permit(:kill)', 'enable_on_exec(:kill)')
+    end
+
+    specify do
+      expect { running_as_root('disable_on_exec(:kill)') }.to \
+        change { subject.effective?(:kill) }.from(true).to(false)
+    end
+  end
+
   # FIXME: Would like to call the given code on subject directly (e.g.
   #        `subject.permit(:fowner)`) but this would require the test
   #        suite to be run as root?
-  def run_as_root(code)
-    system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").#{code}'}
+  def run_as_root(*codes)
+    codes.each do |code|
+      system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").#{code}'}
+    end
   end
   alias running_as_root run_as_root
 end
