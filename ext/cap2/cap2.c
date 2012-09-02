@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/capability.h>
+#include "cap2.h"
 
 /*
  * Converts a Ruby symbol into cap_flag_t set, defined in <sys/capability.h>
@@ -24,57 +25,31 @@ cap_flag_t cap2_sym_to_set(VALUE set) {
 }
 
 /*
- * Converts a Ruby symbol into cap_value_t capability value, defined
- * in <linux/capability.h>
+ * Lookup the value of a capability in cap2_caps, defined in cap2.h
+ * (cap2.h is generated dynamically by extconf.rb).
  *
- * Raises an ArgumentError if cap is not a valid capability value.
+ * Raises an ArgumentError if name is not a valid capability name.
+ */
+cap_value_t cap2_cap_value(const char *name) {
+  int i;
+
+  for(i = 0; i < __CAP_COUNT; i++) {
+    if(strcmp(cap2_caps[i].name, name) == 0)
+      return cap2_caps[i].value;
+  }
+
+  rb_raise(rb_eArgError, "unknown capability %s", name);
+}
+
+/*
+ * Converts a Ruby symbol into a cap_value_t capability value.
  */
 cap_value_t cap2_sym_to_cap(VALUE cap) {
-  char *cap_s;
-
   Check_Type(cap, T_SYMBOL);
 
   cap = rb_sym_to_s(cap);
 
-  cap_s = StringValueCStr(cap);
-
-       if(strcmp(cap_s, "chown")            == 0) return CAP_CHOWN;
-  else if(strcmp(cap_s, "dac_override")     == 0) return CAP_DAC_OVERRIDE;
-  else if(strcmp(cap_s, "dac_read_search")  == 0) return CAP_DAC_READ_SEARCH;
-  else if(strcmp(cap_s, "fowner")           == 0) return CAP_FOWNER;
-  else if(strcmp(cap_s, "fsetid")           == 0) return CAP_FSETID;
-  else if(strcmp(cap_s, "kill")             == 0) return CAP_KILL;
-  else if(strcmp(cap_s, "setgid")           == 0) return CAP_SETGID;
-  else if(strcmp(cap_s, "setuid")           == 0) return CAP_SETUID;
-  else if(strcmp(cap_s, "setpcap")          == 0) return CAP_SETPCAP;
-  else if(strcmp(cap_s, "linux_immutable")  == 0) return CAP_LINUX_IMMUTABLE;
-  else if(strcmp(cap_s, "net_bind_service") == 0) return CAP_NET_BIND_SERVICE;
-  else if(strcmp(cap_s, "net_broadcast")    == 0) return CAP_NET_BROADCAST;
-  else if(strcmp(cap_s, "net_admin")        == 0) return CAP_NET_ADMIN;
-  else if(strcmp(cap_s, "net_raw")          == 0) return CAP_NET_RAW;
-  else if(strcmp(cap_s, "ipc_lock")         == 0) return CAP_IPC_LOCK;
-  else if(strcmp(cap_s, "ipc_owner")        == 0) return CAP_IPC_OWNER;
-  else if(strcmp(cap_s, "sys_module")       == 0) return CAP_SYS_MODULE;
-  else if(strcmp(cap_s, "sys_rawio")        == 0) return CAP_SYS_RAWIO;
-  else if(strcmp(cap_s, "sys_chroot")       == 0) return CAP_SYS_CHROOT;
-  else if(strcmp(cap_s, "sys_ptrace")       == 0) return CAP_SYS_PTRACE;
-  else if(strcmp(cap_s, "sys_pacct")        == 0) return CAP_SYS_PACCT;
-  else if(strcmp(cap_s, "sys_admin")        == 0) return CAP_SYS_ADMIN;
-  else if(strcmp(cap_s, "sys_boot")         == 0) return CAP_SYS_BOOT;
-  else if(strcmp(cap_s, "sys_nice")         == 0) return CAP_SYS_NICE;
-  else if(strcmp(cap_s, "sys_resource")     == 0) return CAP_SYS_RESOURCE;
-  else if(strcmp(cap_s, "sys_time")         == 0) return CAP_SYS_TIME;
-  else if(strcmp(cap_s, "sys_tty_config")   == 0) return CAP_SYS_TTY_CONFIG;
-  else if(strcmp(cap_s, "mknod")            == 0) return CAP_MKNOD;
-  else if(strcmp(cap_s, "lease")            == 0) return CAP_LEASE;
-  else if(strcmp(cap_s, "audit_write")      == 0) return CAP_AUDIT_WRITE;
-  else if(strcmp(cap_s, "audit_control")    == 0) return CAP_AUDIT_CONTROL;
-  else if(strcmp(cap_s, "setfcap")          == 0) return CAP_SETFCAP;
-  else if(strcmp(cap_s, "mac_override")     == 0) return CAP_MAC_OVERRIDE;
-  else if(strcmp(cap_s, "mac_admin")        == 0) return CAP_MAC_ADMIN;
-  else if(strcmp(cap_s, "syslog")           == 0) return CAP_SYSLOG;
-  else if(strcmp(cap_s, "wake_alarm")       == 0) return CAP_WAKE_ALARM;
-  else rb_raise(rb_eArgError, "unknown capability %s", cap_s);
+  return cap2_cap_value(StringValueCStr(cap));
 }
 
 /*
