@@ -12,7 +12,7 @@ describe Cap2::File do
 
     context 'when the file does have the given capability' do
       before(:each) do
-        system %{sudo setcap "cap_dac_override+p" #{file.path}}
+        run_as_root('permit(:dac_override)')
       end
 
       it { should be_permitted(:dac_override) }
@@ -26,7 +26,7 @@ describe Cap2::File do
 
     context 'when the file does have the given capability' do
       before(:each) do
-        system %{sudo setcap "cap_dac_override+pe" #{file.path}}
+        run_as_root('permit(:dac_override)', 'enable_on_exec(:dac_override)')
       end
 
       it { should be_effective(:dac_override) }
@@ -40,7 +40,7 @@ describe Cap2::File do
 
     context 'when the file does have the given capability' do
       before(:each) do
-        system %{sudo setcap "cap_dac_override+i" #{file.path}}
+        run_as_root('allow_inherit(:dac_override)')
       end
 
       it { should be_inheritable(:dac_override) }
