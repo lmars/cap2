@@ -10,7 +10,7 @@ describe Cap2::File do
       it { should_not be_permitted(:dac_override) }
     end
 
-    context 'when the process does have the given capability' do
+    context 'when the file does have the given capability' do
       before(:each) do
         system %{sudo setcap "cap_dac_override+p" #{file.path}}
       end
@@ -24,7 +24,7 @@ describe Cap2::File do
       it { should_not be_effective(:dac_override) }
     end
 
-    context 'when the process does have the given capability' do
+    context 'when the file does have the given capability' do
       before(:each) do
         system %{sudo setcap "cap_dac_override+pe" #{file.path}}
       end
@@ -38,7 +38,7 @@ describe Cap2::File do
       it { should_not be_inheritable(:dac_override) }
     end
 
-    context 'when the process does have the given capability' do
+    context 'when the file does have the given capability' do
       before(:each) do
         system %{sudo setcap "cap_dac_override+i" #{file.path}}
       end
