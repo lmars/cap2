@@ -207,7 +207,7 @@ static char *cap2_file_filename(VALUE file) {
 /*
  * Return a cap_t struct containing the capabilities of the given File object.
  */
-static cap_t cap2_file_caps(VALUE file) {
+static cap_t cap2_file_get_caps(VALUE file) {
   cap_t cap_d;
   char *filename;
 
@@ -279,7 +279,7 @@ VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
   cap_t cap_d;
   VALUE result;
 
-  cap_d = cap2_file_caps(self);
+  cap_d = cap2_file_get_caps(self);
 
   result = cap2_has_cap(cap_d, set_sym, cap_sym);
 
@@ -367,7 +367,7 @@ VALUE cap2_file_enable(VALUE self) {
   cap_t cap_d;
   cap_flag_value_t permitted, inheritable;
 
-  cap_d = cap2_file_caps(self);
+  cap_d = cap2_file_get_caps(self);
 
   for(i = 0, j = 0; i < __CAP_COUNT; i++) {
     cap_value = cap2_caps[i].value;
