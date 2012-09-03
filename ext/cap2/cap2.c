@@ -53,21 +53,50 @@ cap_value_t cap2_sym_to_cap(VALUE cap) {
   return cap2_cap_value(StringValueCStr(cap));
 }
 
-/*
- * Returns a boolean representing whether cap_d has the given capability enabled
- * in the given set.
- */
-VALUE cap2_has_cap(cap_t cap_d, VALUE set_sym, VALUE cap_sym) {
-  cap_flag_t set;
-  cap_value_t cap;
-  cap_flag_value_t flag_value = CAP_CLEAR;
+VALUE cap2_caps_to_hash(cap_t cap_d) {
+  int i;
+  cap_flag_value_t cap_value;
+  VALUE caps, permitted, effective, inheritable;
 
-  set = cap2_sym_to_set(set_sym);
-  cap = cap2_sym_to_cap(cap_sym);
+  permitted = rb_ary_new();
+  effective = rb_ary_new();
+  inheritable = rb_ary_new();
 
-  cap_get_flag(cap_d, cap, set, &flag_value);
+  for(i = 0; i < __CAP_COUNT; i++) {
+    cap_get_flag(cap_d, cap2_caps[i].value, CAP_PERMITTED, &cap_value);
+    if(cap_value == CAP_SET)
+      rb_ary_push(permitted, ID2SYM(rb_intern(cap2_caps[i].name)));
 
-  return flag_value == CAP_SET ? Qtrue : Qfalse;
+    cap_get_flag(cap_d, cap2_caps[i].value, CAP_EFFECTIVE, &cap_value);
+    if(cap_value == CAP_SET)
+      rb_ary_push(effective, ID2SYM(rb_intern(cap2_caps[i].name)));
+
+    cap_get_flag(cap_d, cap2_caps[i].value, CAP_INHERITABLE, &cap_value);
+    if(cap_value == CAP_SET)
+      rb_ary_push(inheritable, ID2SYM(rb_intern(cap2_caps[i].name)));
+  }
+
+  caps = rb_hash_new();
+
+  rb_hash_aset(
+    caps,
+    ID2SYM(rb_intern("permitted")),
+    rb_funcall(permitted, rb_intern("to_set"), 0)
+  );
+
+  rb_hash_aset(
+    caps,
+    ID2SYM(rb_intern("effective")),
+    rb_funcall(effective, rb_intern("to_set"), 0)
+  );
+
+  rb_hash_aset(
+    caps,
+    ID2SYM(rb_intern("inheritable")),
+    rb_funcall(inheritable, rb_intern("to_set"), 0)
+  );
+
+  return caps;
 }
 
 /*
@@ -79,6 +108,28 @@ static int cap2_process_pid(VALUE process) {
   pid = rb_iv_get(process, "@pid");
 
   return FIX2INT(pid);
+}
+
+VALUE cap2_process_getcaps(VALUE self) {
+  cap_t cap_d;
+  int pid;
+  VALUE result;
+
+  pid = cap2_process_pid(self);
+
+  cap_d = cap_get_pid(pid);
+
+  if (cap_d == NULL) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to get capabilities for proccess %d: (%s)\n",
+      pid, strerror(errno)
+    );
+  } else {
+    result = cap2_caps_to_hash(cap_d);
+    cap_free(cap_d);
+    return result;
+  }
 }
 
 /*
@@ -139,28 +190,6 @@ static VALUE cap2_process_set_cap(VALUE process, cap_flag_t set, VALUE cap_sym, 
 
 /*
  * call-seq:
- *  has?(set, capability) -> true or false
- *
- * Return whether the process has the given capability enabled in the given set.
- *
- *   Cap2.process(1).has?(:permitted, :kill)    #=> true
- *   Cap2.process(1000).has?(:permitted, :kill) #=> false
- */
-VALUE cap2_process_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
-  cap_t cap_d;
-  VALUE result;
-
-  cap_d = cap2_process_caps(self);
-
-  result = cap2_has_cap(cap_d, set_sym, cap_sym);
-
-  cap_free(cap_d);
-
-  return result;
-}
-
-/*
- * call-seq:
  *  enable(capability) -> true or false
  *
  * Enable the given capability for this process.
@@ -203,6 +232,28 @@ static char *cap2_file_filename(VALUE file) {
   filename = rb_iv_get(file, "@filename");
 
   return StringValueCStr(filename);
+}
+
+VALUE cap2_file_getcaps(VALUE self) {
+  cap_t cap_d;
+  char *filename;
+  VALUE result;
+
+  filename = cap2_file_filename(self);
+
+  cap_d = cap_get_file(filename);
+
+  if (cap_d == NULL && errno != ENODATA) {
+    rb_raise(
+      rb_eRuntimeError,
+      "Failed to get capabilities for file %s: (%s)\n",
+      filename, strerror(errno)
+    );
+  } else {
+    result = cap2_caps_to_hash(cap_d);
+    cap_free(cap_d);
+    return result;
+  }
 }
 
 /*
@@ -265,28 +316,6 @@ static VALUE cap2_file_set_cap(VALUE file, cap_flag_t set, VALUE cap_sym, cap_fl
   cap_set_flag(cap_d, set, 1, caps, set_or_clear);
 
   result = cap2_file_set_caps(file, cap_d);
-
-  cap_free(cap_d);
-
-  return result;
-}
-
-/*
- * call-seq:
- *  has?(set, capability) -> true or false
- *
- * Return whether the file has the given capability enabled in the given set.
- *
- *   Cap2.file('/bin/ping').has?(:permitted, :net_raw)    #=> true
- *   Cap2.file('/tmp/ping').has?(:permitted, :net_raw)    #=> false
- */
-VALUE cap2_file_has_cap(VALUE self, VALUE set_sym, VALUE cap_sym) {
-  cap_t cap_d;
-  VALUE result;
-
-  cap_d = cap2_file_get_caps(self);
-
-  result = cap2_has_cap(cap_d, set_sym, cap_sym);
 
   cap_free(cap_d);
 
@@ -440,6 +469,8 @@ void Init_cap2(void) {
 
   rb_mCap2 = rb_define_module("Cap2");
 
+  rb_require("set");
+
   /*
    * Expose the list of capability names as an array of symbols in
    * Cap2::NAMES
@@ -451,12 +482,12 @@ void Init_cap2(void) {
   rb_define_const(rb_mCap2, "NAMES", caps_array);
 
   rb_cCap2Process = rb_define_class_under(rb_mCap2, "Process", rb_cObject);
-  rb_define_method(rb_cCap2Process, "has?", cap2_process_has_cap, 2);
+  rb_define_method(rb_cCap2Process, "getcaps", cap2_process_getcaps, 0);
   rb_define_method(rb_cCap2Process, "enable", cap2_process_enable, 1);
   rb_define_method(rb_cCap2Process, "disable", cap2_process_disable, 1);
 
   rb_cCap2File = rb_define_class_under(rb_mCap2, "File", rb_cObject);
-  rb_define_method(rb_cCap2File, "has?", cap2_file_has_cap, 2);
+  rb_define_method(rb_cCap2File, "getcaps", cap2_file_getcaps, 0);
   rb_define_method(rb_cCap2File, "permit", cap2_file_permit, 1);
   rb_define_method(rb_cCap2File, "unpermit", cap2_file_unpermit, 1);
   rb_define_method(rb_cCap2File, "allow_inherit", cap2_file_allow_inherit, 1);

@@ -21,6 +21,11 @@ module Cap2
     def inheritable?(capability)
       has?(:inheritable, capability)
     end
+
+    private
+    def has?(set, capability)
+      getcaps[set].include?(capability)
+    end
   end
 end
 
