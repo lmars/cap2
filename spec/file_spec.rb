@@ -19,17 +19,17 @@ describe Cap2::File do
     end
   end
 
-  describe '#effective?' do
-    context "when the file doesn't have the given capability" do
-      it { should_not be_effective(:dac_override) }
+  describe '#enabled?' do
+    context "when the file's enabled bit is not set" do
+      it { should_not be_enabled }
     end
 
-    context 'when the file does have the given capability' do
+    context "when the file's enabled bit is set" do
       before(:each) do
-        run_as_root('permit(:dac_override)', 'enable_on_exec(:dac_override)')
+        run_as_root('permit(:dac_override)', 'enable')
       end
 
-      it { should be_effective(:dac_override) }
+      it { should be_enabled }
     end
   end
 
@@ -83,48 +83,49 @@ describe Cap2::File do
     end
   end
 
-  describe '#enable_on_exec' do
-    context 'when the capability is not permitted or inheritable' do
-      specify do
-        expect { subject.enable_on_exec(:lease) }.to \
-          raise_error(
-            Cap2::IncompatibleCapabilities,
-            'cannot enable_on_exec a capability which is neither permitted nor inheritable'
-          )
-      end
-    end
-
-    context 'when the capability is permitted' do
+  context 'enabling and disabling' do
+    context 'when at least one capability is permitted' do
       before(:each) do
-        run_as_root('permit(:lease)')
+        run_as_root('permit(:kill)')
       end
 
-      specify do
-        expect { running_as_root('enable_on_exec(:lease)') }.to \
-          change { subject.effective?(:lease) }.from(false).to(true)
+      describe '#enable' do
+        specify do
+          expect { running_as_root('enable') }.to \
+            change { subject.enabled? }.from(false).to(true)
+        end
+      end
+
+      describe '#disable' do
+        before(:each) do
+          run_as_root('enable')
+        end
+
+        specify do
+          expect { running_as_root('disable') }.to \
+            change { subject.enabled? }.from(true).to(false)
+        end
       end
     end
 
-    context 'when the capability is inheritable' do
-      before(:each) do
-        run_as_root('allow_inherit(:lease)')
+    context 'when no capabilities are permitted or inheritable' do
+      describe '#enable' do
+        specify do
+          expect { running_as_root('enable') }.to_not \
+            change { subject.enabled? }.from(false)
+        end
       end
 
-      specify do
-        expect { running_as_root('enable_on_exec(:lease)') }.to \
-          change { subject.effective?(:lease) }.from(false).to(true)
+      describe '#disable' do
+        before(:each) do
+          run_as_root('enable')
+        end
+
+        specify do
+          expect { running_as_root('disable') }.to_not \
+            change { subject.enabled? }.from(false)
+        end
       end
-    end
-  end
-
-  describe '#disable_on_exec' do
-    before(:each) do
-      run_as_root('permit(:kill)', 'enable_on_exec(:kill)')
-    end
-
-    specify do
-      expect { running_as_root('disable_on_exec(:kill)') }.to \
-        change { subject.effective?(:kill) }.from(true).to(false)
     end
   end
 

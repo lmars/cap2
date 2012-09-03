@@ -11,16 +11,10 @@ module Cap2
       @filename = filename
     end
 
-    # Enable the given capability in the file's effective set.
-    #
-    # The capability must be either permitted or inheritable (or else it cannot
-    # possibly be enabled in the new process).
-    def enable_on_exec(capability)
-      if permitted?(capability) || inheritable?(capability)
-        set_effective(capability)
-      else
-        raise IncompatibleCapabilities, 'cannot enable_on_exec a capability which is neither permitted nor inheritable'
-      end
+    # Returns whether or not the file has any effective
+    # capabilities.
+    def enabled?
+      NAMES.any? { |c| effective?(c) }
     end
   end
 end
