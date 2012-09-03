@@ -74,6 +74,15 @@ ping.effective?(:net_raw)       # => true
 ping.inheritable?(:net_raw)     # => false
 ```
 
+Under the hood, the file effective set is just a single bit. When enabled, any process which exec's the file will have the capabilities from it's resulting permitted set also in it's effective set. Because of this, there is a method `Cap2::File#enabled?` which returns whether this bit is set or not:
+
+```
+ping = Cap2.file('/bin/ping')   # => #<Cap2::File @filename="/bin/ping">
+
+ping.permitted?(:net_raw)       # => true
+ping.enabled?                   # => true
+```
+
 ### Modifying Capabilities
 
 Cap2 provides different levels of control over process and file capabilities.
@@ -96,20 +105,21 @@ file.unpermit(:mknod)               # => true
 file.permitted?(:mknod)             # => false
 ```
 
-To modify the effective capabilities of a file (i.e. the capabilities which will be enabled in any process that exec's the file), use `Cap2::File#enable_on_exec` and `Cap2::File#disable_on_exec`:
+To modify the effective bit of a file (i.e. whether the resulting permitted capabilities of any process that exec's the file will also be enabled in it's effective set), use `Cap2::File#enable` and `Cap2::File#disable`:
 
 ```
 Cap2.process.effective?(:setfcap)   # => true - needed to set file capabilities
 
 file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
 
-file.effective?(:net_raw)           # => false
+file.permitted?(:net_raw)           # => true
+file.enabled?                       # => false
 
-file.enable_on_exec(:net_raw)       # => true
-file.effective?(:net_raw)           # => true
+file.enable                         # => true
+file.enabled?                       # => true
 
-file.disable_on_exec(:net_raw)      # => true
-file.effective?(:net_raw)           # => false
+file.disable                        # => true
+file.enabled?                       # => false
 ```
 
 To modify the inheritable capabilities of a file (i.e. the capabilities which will be ANDed with the inheritable set of any process that exec's the file to determine which capabilities are in the permitted set of the process), use `Cap2::File#allow_inherit` and `Cap2::File#disallow_inherit`:
