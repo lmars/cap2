@@ -1,4 +1,5 @@
 #include <ruby.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/capability.h>
@@ -227,21 +228,12 @@ static cap_t cap2_file_get_caps(VALUE file) {
 }
 
 /*
- * Enable/disable the given capabilities in the gievn set for the given File
- * object.
+ * Set the given capabilities for the given File object.
  */
-static VALUE cap2_file_set_caps(VALUE file, cap_flag_t set, int no_values, cap_value_t *values, cap_flag_value_t set_or_clear) {
-  cap_t cap_d;
+static VALUE cap2_file_set_caps(VALUE file, cap_t cap_d) {
   char *filename;
 
   filename = cap2_file_filename(file);
-
-  cap_d = cap_get_file(filename);
-
-  if(cap_d == NULL)
-    cap_d = cap_init();
-
-  cap_set_flag(cap_d, set, no_values, values, set_or_clear);
 
   if(cap_set_file(filename, cap_d) == -1) {
     rb_raise(
@@ -259,11 +251,24 @@ static VALUE cap2_file_set_caps(VALUE file, cap_flag_t set, int no_values, cap_v
  * object.
  */
 static VALUE cap2_file_set_cap(VALUE file, cap_flag_t set, VALUE cap_sym, cap_flag_value_t set_or_clear) {
+  cap_t cap_d;
   cap_value_t caps[1];
+  VALUE result;
+
+  cap_d = cap2_file_get_caps(file);
+
+  if(cap_d == NULL)
+    cap_d = cap_init();
 
   caps[0] = cap2_sym_to_cap(cap_sym);
 
-  cap2_file_set_caps(file, set, 1, caps, set_or_clear);
+  cap_set_flag(cap_d, set, 1, caps, set_or_clear);
+
+  result = cap2_file_set_caps(file, cap_d);
+
+  cap_free(cap_d);
+
+  return result;
 }
 
 /*
@@ -362,27 +367,39 @@ VALUE cap2_file_disallow_inherit(VALUE self, VALUE cap_sym) {
  *   file.enabled?                     #=> true
  */
 VALUE cap2_file_enable(VALUE self) {
-  int i, j;
-  cap_value_t cap_value, values[__CAP_COUNT];
+  int i;
+  bool enabled;
+  cap_value_t caps[1];
   cap_t cap_d;
   cap_flag_value_t permitted, inheritable;
+  VALUE result;
 
   cap_d = cap2_file_get_caps(self);
 
-  for(i = 0, j = 0; i < __CAP_COUNT; i++) {
-    cap_value = cap2_caps[i].value;
+  if(cap_d == NULL)
+    return Qfalse;
 
-    cap_get_flag(cap_d, cap_value, CAP_PERMITTED,   &permitted);
-    cap_get_flag(cap_d, cap_value, CAP_INHERITABLE, &inheritable);
+  enabled = false;
 
-    if(permitted | inheritable)
-      values[j++] = cap_value;
+  for(i = 0; i < __CAP_COUNT; i++) {
+    caps[0] = cap2_caps[i].value;
+
+    cap_get_flag(cap_d, caps[0], CAP_PERMITTED,   &permitted);
+    cap_get_flag(cap_d, caps[0], CAP_INHERITABLE, &inheritable);
+
+    if(permitted | inheritable) {
+      enabled = true;
+      cap_set_flag(cap_d, CAP_EFFECTIVE, 1, caps, CAP_SET);
+    }
   }
 
-  if(j > 0)
-    return cap2_file_set_caps(self, CAP_EFFECTIVE, j, values, CAP_SET);
-  else
+  if(enabled) {
+    result = cap2_file_set_caps(self, cap_d);
+    cap_free(cap_d);
+    return result;
+  } else {
     return Qfalse;
+  }
 }
 
 /*
@@ -398,26 +415,20 @@ VALUE cap2_file_enable(VALUE self) {
  */
 VALUE cap2_file_disable(VALUE self) {
   cap_t cap_d;
-  char *filename;
+  VALUE result;
 
-  filename = cap2_file_filename(self);
-
-  cap_d = cap_get_file(filename);
+  cap_d = cap2_file_get_caps(self);
 
   if(cap_d == NULL)
     return Qtrue;
 
   cap_clear_flag(cap_d, CAP_EFFECTIVE);
 
-  if(cap_set_file(filename, cap_d) == -1) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to set capabilities for file %s: (%s)\n",
-      filename, strerror(errno)
-    );
-  } else {
-    return Qtrue;
-  }
+  result = cap2_file_set_caps(self, cap_d);
+
+  cap_free(cap_d);
+
+  return result;
 }
 
 void Init_cap2(void) {
