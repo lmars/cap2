@@ -1,21 +1,30 @@
-require 'cap2/set_methods'
-
 module Cap2
   # A class with methods for querying capabilities for the
   # file with filename provided to the initialize method.
   class File
-    include SetMethods
-
     # Initialize a new File object for the given filename.
     def initialize(filename)
       @filename = filename
       @caps     = getcaps
     end
 
+    # Returns whether the given capability is permitted
+    def permitted?(capability)
+      reload
+      @caps[:permitted].include? capability
+    end
+
+    # Returns whether the given capability is inheritable
+    def inheritable?(capability)
+      reload
+      @caps[:inheritable].include? capability
+    end
+
     # Returns whether or not the file has any effective
     # capabilities.
     def enabled?
-      NAMES.any? { |c| effective?(c) }
+      reload
+      !@caps[:effective].empty?
     end
 
     # Permit processes executing this file to enable the given capability.
@@ -52,6 +61,11 @@ module Cap2
     def disable
       @caps[:effective].clear
       save
+    end
+
+    private
+    def reload
+      @caps = getcaps
     end
   end
 end
