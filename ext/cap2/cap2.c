@@ -234,6 +234,9 @@ static char *cap2_file_filename(VALUE file) {
   return StringValueCStr(filename);
 }
 
+/*
+ * Return a caps hash containing the capabilities of self.
+ */
 VALUE cap2_file_getcaps(VALUE self) {
   cap_t cap_d;
   char *filename;
@@ -257,34 +260,62 @@ VALUE cap2_file_getcaps(VALUE self) {
 }
 
 /*
- * Return a cap_t struct containing the capabilities of the given File object.
+ * Set the capabilities for self from the caps hash stored in @caps.
  */
-static cap_t cap2_file_get_caps(VALUE file) {
+VALUE cap2_file_setcaps(VALUE self) {
+  int i;
   cap_t cap_d;
   char *filename;
+  VALUE caps, cap_array, cap_sym;
+  cap_value_t cap_values[__CAP_COUNT];
 
-  filename = cap2_file_filename(file);
+  cap_d = cap_init();
 
-  cap_d = cap_get_file(filename);
+  caps = rb_iv_get(self, "@caps");
 
-  if (cap_d == NULL && errno != ENODATA) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to get capabilities for file %s: (%s)\n",
-      filename, strerror(errno)
-    );
+  // permitted
+  cap_array = rb_funcall(
+    rb_hash_aref(caps, ID2SYM(rb_intern("permitted"))),
+    rb_intern("to_a"),
+    0
+  );
+
+  for(i = 0; i < RARRAY_LEN(cap_array); i++) {
+    cap_sym = RARRAY_PTR(cap_array)[i];
+    cap_values[i] = cap2_sym_to_cap(cap_sym);
   }
 
-  return cap_d;
-}
+  cap_set_flag(cap_d, CAP_PERMITTED, i, cap_values, CAP_SET);
 
-/*
- * Set the given capabilities for the given File object.
- */
-static VALUE cap2_file_set_caps(VALUE file, cap_t cap_d) {
-  char *filename;
+  // effective
+  cap_array = rb_funcall(
+    rb_hash_aref(caps, ID2SYM(rb_intern("effective"))),
+    rb_intern("to_a"),
+    0
+  );
 
-  filename = cap2_file_filename(file);
+  for(i = 0; i < RARRAY_LEN(cap_array); i++) {
+    cap_sym = RARRAY_PTR(cap_array)[i];
+    cap_values[i] = cap2_sym_to_cap(cap_sym);
+  }
+
+  cap_set_flag(cap_d, CAP_EFFECTIVE, i, cap_values, CAP_SET);
+
+  // inheritable
+  cap_array = rb_funcall(
+    rb_hash_aref(caps, ID2SYM(rb_intern("inheritable"))),
+    rb_intern("to_a"),
+    0
+  );
+
+  for(i = 0; i < RARRAY_LEN(cap_array); i++) {
+    cap_sym = RARRAY_PTR(cap_array)[i];
+    cap_values[i] = cap2_sym_to_cap(cap_sym);
+  }
+
+  cap_set_flag(cap_d, CAP_INHERITABLE, i, cap_values, CAP_SET);
+
+  filename = cap2_file_filename(self);
 
   if(cap_set_file(filename, cap_d) == -1) {
     rb_raise(
@@ -293,171 +324,9 @@ static VALUE cap2_file_set_caps(VALUE file, cap_t cap_d) {
       filename, strerror(errno)
     );
   } else {
-    return Qtrue;
-  }
-}
-
-/*
- * Enable/disable the given capability in the given set for the given File
- * object.
- */
-static VALUE cap2_file_set_cap(VALUE file, cap_flag_t set, VALUE cap_sym, cap_flag_value_t set_or_clear) {
-  cap_t cap_d;
-  cap_value_t caps[1];
-  VALUE result;
-
-  cap_d = cap2_file_get_caps(file);
-
-  if(cap_d == NULL)
-    cap_d = cap_init();
-
-  caps[0] = cap2_sym_to_cap(cap_sym);
-
-  cap_set_flag(cap_d, set, 1, caps, set_or_clear);
-
-  result = cap2_file_set_caps(file, cap_d);
-
-  cap_free(cap_d);
-
-  return result;
-}
-
-/*
- * call-seq:
- *  permit(capability) -> true or false
- *
- * Permit processes executing this file to enable the given capability.
- *
- *   file = Cap2.file('/tmp/killer')    #=> <Cap2::File>
- *   file.permitted?(:kill)             #=> false
- *   file.permit(:kill)                 #=> true
- *   file.permitted?(:kill)             #=> true
- */
-VALUE cap2_file_permit(VALUE self, VALUE cap_sym) {
-  return cap2_file_set_cap(self, CAP_PERMITTED, cap_sym, CAP_SET);
-}
-
-/*
- * call-seq:
- *  unpermit(capability) -> true or false
- *
- * Dont permit processes executing ths file to enable the given capability.
- *
- *   file = Cap2.file('/tmp/foo')      #=> <Cap2::File>
- *   file.permit(:kill)                #=> true
- *   file.permitted?(:kill)            #=> true
- *   file.unpermit(:kill)              #=> true
- *   file.permitted?(:kill)            #=> false
- */
-VALUE cap2_file_unpermit(VALUE self, VALUE cap_sym) {
-  return cap2_file_set_cap(self, CAP_PERMITTED, cap_sym, CAP_CLEAR);
-}
-
-/*
- * call-seq:
- *  allow_inherit(capability) -> true or false
- *
- * Allow processes executing this file to inherit the given capability.
- *
- *   file = Cap2.file('/tmp/foo')      #=> <Cap2::File>
- *   file.inheritable?(:kill)          #=> false
- *   file.allow_inherit(:kill)         #=> true
- *   file.inheritable?(:kill)          #=> true
- */
-VALUE cap2_file_allow_inherit(VALUE self, VALUE cap_sym) {
-  return cap2_file_set_cap(self, CAP_INHERITABLE, cap_sym, CAP_SET);
-}
-
-/*
- * call-seq:
- *  disallow_inherit(capability) -> true or false
- *
- * Dont allow processes executing this file to inherit the given capability.
- *
- *   file = Cap2.file('/tmp/foo')      #=> <Cap2::File>
- *   file.inheritable?(:kill)          #=> true
- *   file.allow_inherit(:kill)         #=> true
- *   file.inheritable?(:kill)          #=> false
- */
-VALUE cap2_file_disallow_inherit(VALUE self, VALUE cap_sym) {
-  return cap2_file_set_cap(self, CAP_INHERITABLE, cap_sym, CAP_CLEAR);
-}
-
-/*
- * call-seq:
- *  enable -> true or false
- *
- * Enable the permitted capabilities when a proces executes this file.
- *
- *   file = Cap2.file('/tmp/foo')      #=> <Cap2::File>
- *   file.permitted?(:kill)            #=> true
- *   file.enabled?                     #=> false
- *   file.enable                       #=> true
- *   file.enabled?                     #=> true
- */
-VALUE cap2_file_enable(VALUE self) {
-  int i;
-  bool enabled;
-  cap_value_t caps[1];
-  cap_t cap_d;
-  cap_flag_value_t permitted, inheritable;
-  VALUE result;
-
-  cap_d = cap2_file_get_caps(self);
-
-  if(cap_d == NULL)
-    return Qfalse;
-
-  enabled = false;
-
-  for(i = 0; i < __CAP_COUNT; i++) {
-    caps[0] = cap2_caps[i].value;
-
-    cap_get_flag(cap_d, caps[0], CAP_PERMITTED,   &permitted);
-    cap_get_flag(cap_d, caps[0], CAP_INHERITABLE, &inheritable);
-
-    if(permitted | inheritable) {
-      enabled = true;
-      cap_set_flag(cap_d, CAP_EFFECTIVE, 1, caps, CAP_SET);
-    }
-  }
-
-  if(enabled) {
-    result = cap2_file_set_caps(self, cap_d);
     cap_free(cap_d);
-    return result;
-  } else {
-    return Qfalse;
-  }
-}
-
-/*
- * call-seq:
- *  disable -> true or false
- *
- * Dont enable the permitted capabilities when a proces executes this file.
- *
- *   file = Cap2.file('/tmp/foo')      #=> <Cap2::File>
- *   file.enabled?                     #=> true
- *   file.disable                      #=> true
- *   file.enabled?                     #=> false
- */
-VALUE cap2_file_disable(VALUE self) {
-  cap_t cap_d;
-  VALUE result;
-
-  cap_d = cap2_file_get_caps(self);
-
-  if(cap_d == NULL)
     return Qtrue;
-
-  cap_clear_flag(cap_d, CAP_EFFECTIVE);
-
-  result = cap2_file_set_caps(self, cap_d);
-
-  cap_free(cap_d);
-
-  return result;
+  }
 }
 
 void Init_cap2(void) {
@@ -488,10 +357,5 @@ void Init_cap2(void) {
 
   rb_cCap2File = rb_define_class_under(rb_mCap2, "File", rb_cObject);
   rb_define_method(rb_cCap2File, "getcaps", cap2_file_getcaps, 0);
-  rb_define_method(rb_cCap2File, "permit", cap2_file_permit, 1);
-  rb_define_method(rb_cCap2File, "unpermit", cap2_file_unpermit, 1);
-  rb_define_method(rb_cCap2File, "allow_inherit", cap2_file_allow_inherit, 1);
-  rb_define_method(rb_cCap2File, "disallow_inherit", cap2_file_disallow_inherit, 1);
-  rb_define_method(rb_cCap2File, "enable", cap2_file_enable, 0);
-  rb_define_method(rb_cCap2File, "disable", cap2_file_disable, 0);
+  rb_define_method(rb_cCap2File, "save", cap2_file_setcaps, 0);
 }
