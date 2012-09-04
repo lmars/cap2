@@ -133,94 +133,70 @@ VALUE cap2_process_getcaps(VALUE self) {
 }
 
 /*
- * Return a cap_t struct containing the capabilities of the given Process object.
+ * Set the capabilities for self from the caps hash stored in @caps.
  */
-static cap_t cap2_process_caps(VALUE process) {
+VALUE cap2_process_setcaps(VALUE self) {
+  int i;
   cap_t cap_d;
-  int pid;
+  VALUE caps, cap_array, cap_sym;
+  cap_value_t cap_values[__CAP_COUNT];
 
-  pid = cap2_process_pid(process);
+  cap_d = cap_init();
 
-  cap_d = cap_get_pid(pid);
+  caps = rb_iv_get(self, "@caps");
 
-  if (cap_d == NULL) {
-    rb_raise(
-      rb_eRuntimeError,
-      "Failed to get capabilities for proccess %d: (%s)\n",
-      pid, strerror(errno)
-    );
+  // permitted
+  cap_array = rb_funcall(
+    rb_hash_aref(caps, ID2SYM(rb_intern("permitted"))),
+    rb_intern("to_a"),
+    0
+  );
+
+  for(i = 0; i < RARRAY_LEN(cap_array); i++) {
+    cap_sym = RARRAY_PTR(cap_array)[i];
+    cap_values[i] = cap2_sym_to_cap(cap_sym);
   }
 
-  return cap_d;
-}
+  cap_set_flag(cap_d, CAP_PERMITTED, i, cap_values, CAP_SET);
 
-/*
- * Enable/disable the given capability in the given set for the given Process
- * object.
- */
-static VALUE cap2_process_set_cap(VALUE process, cap_flag_t set, VALUE cap_sym, cap_flag_value_t set_or_clear) {
-  cap_t cap_d;
-  int pid;
-  cap_value_t caps[1];
+  // effective
+  cap_array = rb_funcall(
+    rb_hash_aref(caps, ID2SYM(rb_intern("effective"))),
+    rb_intern("to_a"),
+    0
+  );
 
-  pid = cap2_process_pid(process);
+  for(i = 0; i < RARRAY_LEN(cap_array); i++) {
+    cap_sym = RARRAY_PTR(cap_array)[i];
+    cap_values[i] = cap2_sym_to_cap(cap_sym);
+  }
 
-  if((pid_t) pid != getpid())
-    rb_raise(
-      rb_eRuntimeError,
-      "Cannot set capabilities for other processes"
-    );
+  cap_set_flag(cap_d, CAP_EFFECTIVE, i, cap_values, CAP_SET);
 
-  caps[0] = cap2_sym_to_cap(cap_sym);
+  // inheritable
+  cap_array = rb_funcall(
+    rb_hash_aref(caps, ID2SYM(rb_intern("inheritable"))),
+    rb_intern("to_a"),
+    0
+  );
 
-  cap_d = cap_get_pid(pid);
+  for(i = 0; i < RARRAY_LEN(cap_array); i++) {
+    cap_sym = RARRAY_PTR(cap_array)[i];
+    cap_values[i] = cap2_sym_to_cap(cap_sym);
+  }
 
-  cap_set_flag(cap_d, set, 1, caps, set_or_clear);
+  cap_set_flag(cap_d, CAP_INHERITABLE, i, cap_values, CAP_SET);
 
   if(cap_set_proc(cap_d) == -1) {
     rb_raise(
       rb_eRuntimeError,
-      "Failed to set capabilities for process %d: (%s)\n",
-      pid, strerror(errno)
+      "Failed to set capabilities for current process: (%s)\n",
+      strerror(errno)
     );
   } else {
+    cap_free(cap_d);
     return Qtrue;
   }
-}
-
-/*
- * call-seq:
- *  enable(capability) -> true or false
- *
- * Enable the given capability for this process.
- *
- * Raises a RuntimeError if the process's pid is not the same as the current
- * pid (you cannot enable capabilities for other processes, that's their job).
- *
- *   process = Cap2.process              #=> <Cap2::Process>
- *   process.permitted?(:kill)           #=> true
- *   process.effective?(:kill)           #=> false
- *   process.enable(:kill)               #=> true
- *   process.effective?(:kill)           #=> true
- */
-VALUE cap2_process_enable(VALUE self, VALUE cap_sym) {
-  return cap2_process_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_SET);
-}
-
-/*
- * call-seq:
- *  disable(capability) -> true or false
- *
- * Disable the given capability for this process.
- *
- *   process = Cap2.process              #=> <Cap2::Process>
- *   process.permitted?(:kill)           #=> true
- *   process.effective?(:kill)           #=> true
- *   process.disable(:kill)              #=> true
- *   process.effective?(:kill)           #=> false
- */
-VALUE cap2_process_disable(VALUE self, VALUE cap_sym) {
-  return cap2_process_set_cap(self, CAP_EFFECTIVE, cap_sym, CAP_CLEAR);
 }
 
 /*
@@ -339,8 +315,7 @@ void Init_cap2(void) {
 
   rb_cCap2Process = rb_define_class_under(rb_mCap2, "Process", rb_cObject);
   rb_define_method(rb_cCap2Process, "getcaps", cap2_process_getcaps, 0);
-  rb_define_method(rb_cCap2Process, "enable", cap2_process_enable, 1);
-  rb_define_method(rb_cCap2Process, "disable", cap2_process_disable, 1);
+  rb_define_method(rb_cCap2Process, "save", cap2_process_setcaps, 0);
 
   rb_cCap2File = rb_define_class_under(rb_mCap2, "File", rb_cObject);
   rb_define_method(rb_cCap2File, "getcaps", cap2_file_getcaps, 0);
