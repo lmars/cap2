@@ -49,16 +49,16 @@ Capabilities are referenced using lower cased symbols, and without the CAP_ pref
 
 ### Querying Capabilities
 
-There are three methods - `permitted?`, `effective?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each take a capability symbol and return true / false if the capability is in / not in the relevant set:
+There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each take a capability symbol and return true / false if the capability is in / not in the relevant set:
 
 ```
-# the init daemon - all caps permitted & effective but not inheritable
+# the init daemon - all caps permitted & enabled but not inheritable
 init = Cap2.process(1)      # => #<Cap2::Process @pid=1>
 
 init.permitted?(:kill)      # => true
 init.permitted?(:chown)     # => true
 
-init.effective?(:fowner)    # => true
+init.enabled?(:fowner)      # => true
 
 init.inheritable?(:kill)    # => false
 init.inheritable?(:fowner)  # => false
@@ -69,7 +69,7 @@ ping = Cap2.file('/bin/ping')   # => #<Cap2::File @filename="/bin/ping">
 ping.permitted?(:net_raw)       # => true
 ping.permitted?(:mknod)         # => false
 
-ping.effective?(:net_raw)       # => true
+ping.enabled?(:net_raw)         # => true
 
 ping.inheritable?(:net_raw)     # => false
 ```
@@ -92,7 +92,7 @@ Cap2 provides different levels of control over process and file capabilities.
 To modify the permitted capabilities of a file (i.e. the capabilities which will be permitted in any process that exec's the file), use `Cap2::File#permit` and `Cap2::File#unpermit`:
 
 ```
-Cap2.process.effective?(:setfcap)   # => true - needed to set file capabilities
+Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
 
 file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
 
@@ -108,7 +108,7 @@ file.permitted?(:mknod)             # => false
 To modify the effective bit of a file (i.e. whether the resulting permitted capabilities of any process that exec's the file will also be enabled in it's effective set), use `Cap2::File#enable` and `Cap2::File#disable`:
 
 ```
-Cap2.process.effective?(:setfcap)   # => true - needed to set file capabilities
+Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
 
 file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
 
@@ -125,7 +125,7 @@ file.enabled?                       # => false
 To modify the inheritable capabilities of a file (i.e. the capabilities which will be ANDed with the inheritable set of any process that exec's the file to determine which capabilities are in the permitted set of the process), use `Cap2::File#allow_inherit` and `Cap2::File#disallow_inherit`:
 
 ```
-Cap2.process.effective?(:setfcap)   # => true - needed to set file capabilities
+Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
 
 file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
 
@@ -147,17 +147,17 @@ Suppose the ruby binary file permits :kill, but does not enable it on exec:
 ```
 ruby = Cap2.file('/usr/bin/ruby')   # => #<Cap2::File @filename="/usr/bin/ruby">
 ruby.permitted?(:kill)              # => true
-ruby.effective?(:kill)              # => false
+ruby.enabled?                       # => false
 ```
 
 and we want to kill a process running as root with pid 1000:
 
 ```
-Cap2.process.effective?(:kill)  # => false
+Cap2.process.enabled?(:kill)    # => false
 Process.kill("TERM", 1000)      # => Errno::EPERM: Operation not permitted
 
 Cap2.process.enable(:kill)      # => true
-Cap2.process.effective?(:kill)  # => true
+Cap2.process.enabled?(:kill)    # => true
 Process.kill("TERM", 1000)      # => 1
 ```
 

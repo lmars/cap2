@@ -14,8 +14,8 @@ module Cap2
       @caps[:permitted].include? capability
     end
 
-    # Returns whether the given capability is effective
-    def effective?(capability)
+    # Returns whether the given capability is enabled
+    def enabled?(capability)
       reload
       @caps[:effective].include? capability
     end

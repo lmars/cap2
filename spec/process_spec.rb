@@ -15,17 +15,17 @@ describe Cap2::Process do
     end
   end
 
-  describe '#effective?' do
+  describe '#enabled?' do
     context "when the process doesn't have the given capability" do
       subject { Cap2::Process.new(Process.pid) }
 
-      it { should_not be_effective(:dac_override) }
+      it { should_not be_enabled(:dac_override) }
     end
 
     context 'when the process does have the given capability' do
       subject { Cap2::Process.new(1) }
 
-      it { should be_effective(:dac_override) }
+      it { should be_enabled(:dac_override) }
     end
   end
 end
