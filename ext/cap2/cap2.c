@@ -337,8 +337,6 @@ void Init_cap2(void) {
 
   rb_mCap2 = rb_define_module("Cap2");
 
-  rb_require("set");
-
   rb_cCap2Process = rb_define_class_under(rb_mCap2, "Process", rb_cObject);
   rb_define_method(rb_cCap2Process, "getcaps", cap2_process_getcaps, 0);
   rb_define_method(rb_cCap2Process, "enable", cap2_process_enable, 1);

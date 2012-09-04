@@ -1,3 +1,4 @@
+require 'set'
 require 'cap2.so'
 require 'cap2/process'
 require 'cap2/file'
