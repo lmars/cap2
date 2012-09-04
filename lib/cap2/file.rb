@@ -1,5 +1,5 @@
 module Cap2
-  # A class with methods for querying capabilities for the
+  # A class with methods for managing capabilities for the
   # file with filename provided to the initialize method.
   class File
     # Initialize a new File object for the given filename.
