@@ -334,21 +334,10 @@ void Init_cap2(void) {
   VALUE rb_mCap2;
   VALUE rb_cCap2File;
   VALUE rb_cCap2Process;
-  VALUE caps_array;
 
   rb_mCap2 = rb_define_module("Cap2");
 
   rb_require("set");
-
-  /*
-   * Expose the list of capability names as an array of symbols in
-   * Cap2::NAMES
-   */
-  caps_array = rb_ary_new();
-  for(i = 0; i < __CAP_COUNT; i++) {
-    rb_ary_push(caps_array, ID2SYM(rb_intern(cap2_caps[i].name)));
-  }
-  rb_define_const(rb_mCap2, "NAMES", caps_array);
 
   rb_cCap2Process = rb_define_class_under(rb_mCap2, "Process", rb_cObject);
   rb_define_method(rb_cCap2Process, "getcaps", cap2_process_getcaps, 0);
