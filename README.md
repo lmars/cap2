@@ -49,7 +49,7 @@ Capabilities are referenced using lower cased symbols, and without the CAP_ pref
 
 ### Querying Capabilities
 
-There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each take a capability symbol and return true / false if the capability is in / not in the relevant set:
+There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each of these methods, Cap2::File#enabled? being the exception, take a capability symbol and return true / false if the capability is in / not in the relevant set:
 
 ```
 # the init daemon - all caps permitted & enabled but not inheritable
@@ -69,19 +69,14 @@ ping = Cap2.file('/bin/ping')   # => #<Cap2::File @filename="/bin/ping">
 ping.permitted?(:net_raw)       # => true
 ping.permitted?(:mknod)         # => false
 
-ping.enabled?(:net_raw)         # => true
+ping.enabled?                   # => true
 
 ping.inheritable?(:net_raw)     # => false
 ```
 
-Under the hood, the file effective set is just a single bit. When enabled, any process which exec's the file will have the capabilities from it's resulting permitted set also in it's effective set. Because of this, there is a method `Cap2::File#enabled?` which returns whether this bit is set or not:
+#### Why does Cap2::File#enabled? not take an arguement?
 
-```
-ping = Cap2.file('/bin/ping')   # => #<Cap2::File @filename="/bin/ping">
-
-ping.permitted?(:net_raw)       # => true
-ping.enabled?                   # => true
-```
+Under the hood, the file effective set is just a single bit. When enabled, any process which exec's the file will have the capabilities from it's resulting permitted set also in it's effective set.
 
 ### Modifying Capabilities
 
