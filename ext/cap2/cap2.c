@@ -6,26 +6,6 @@
 #include "cap2.h"
 
 /*
- * Converts a Ruby symbol into cap_flag_t set, defined in <sys/capability.h>
- *
- * Raises an ArgumentError if set is not a valid capability set.
- */
-cap_flag_t cap2_sym_to_set(VALUE set) {
-  char *set_s;
-
-  Check_Type(set, T_SYMBOL);
-
-  set = rb_sym_to_s(set);
-
-  set_s = StringValueCStr(set);
-
-       if(strcmp(set_s, "permitted")   == 0) return CAP_PERMITTED;
-  else if(strcmp(set_s, "effective")   == 0) return CAP_EFFECTIVE;
-  else if(strcmp(set_s, "inheritable") == 0) return CAP_INHERITABLE;
-  else rb_raise(rb_eArgError, "unknown set %s", set_s);
-}
-
-/*
  * Lookup the value of a capability in cap2_caps, defined in cap2.h
  * (cap2.h is generated dynamically by extconf.rb).
  *
