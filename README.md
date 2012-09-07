@@ -137,7 +137,7 @@ file.inheritable?(:fowner)          # => false
 
 Cap2 can be used to enable / disable capabilities of the current Ruby process.
 
-Suppose the ruby binary file permits :kill, but does not enable it on exec:
+Suppose the ruby binary file permits `:kill`, but does not enable it on exec:
 
 ```
 ruby = Cap2.file('/usr/bin/ruby')   # => #<Cap2::File @filename="/usr/bin/ruby">
