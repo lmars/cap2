@@ -44,7 +44,7 @@ module Cap2
     # Raises a RuntimeError if the process's pid is not the same as the current
     # pid (you cannot enable capabilities for other processes, that's their job).
     def check_pid
-      unless @pid == Process.pid
+      unless @pid == ::Process.pid
         raise 'Cannot modify capabilities of other processes'
       end
     end
