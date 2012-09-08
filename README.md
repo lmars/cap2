@@ -133,6 +133,28 @@ file.disallow_inherit(:fowner)      # => true
 file.inheritable?(:fowner)          # => false
 ```
 
+To clear all capabilities for a file, use Cap2::File#clear:
+
+```
+Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
+
+file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
+
+file.permit(:kill)                  # => true
+file.allow_inherit(:kill)           # => true
+file.enable                         # => true
+
+file.permitted?(:kill)              # => true
+file.inheritable?(:kill)            # => true
+file.enabled?                       # => true
+
+file.clear                          # => true
+
+file.permitted?(:kill)              # => false
+file.inheritable?(:kill)            # => false
+file.enabled?                       # => false
+```
+
 #### Processes
 
 Cap2 can be used to enable / disable capabilities of the current Ruby process.

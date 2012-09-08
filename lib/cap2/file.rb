@@ -63,6 +63,12 @@ module Cap2
       save
     end
 
+    # Clear all capabilites
+    def clear
+      @caps.each_pair { |_, s| s.clear }
+      save
+    end
+
     private
     def reload
       @caps = getcaps

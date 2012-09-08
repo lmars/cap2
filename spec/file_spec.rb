@@ -5,6 +5,10 @@ describe Cap2::File do
 
   subject { Cap2::File.new(file.path) }
 
+  before(:each) do
+    run_as_root('clear')
+  end
+
   describe '#permitted?' do
     context "when the file doesn't have the given capability" do
       it { should_not be_permitted(:dac_override) }
@@ -126,6 +130,18 @@ describe Cap2::File do
             change { subject.enabled? }.from(false)
         end
       end
+    end
+  end
+
+  describe '#clear' do
+    it 'should clear all capabilities' do
+      run_as_root('permit(:kill)', 'allow_inherit(:kill)', 'enable')
+
+      run_as_root('clear')
+
+      subject.should_not be_permitted(:kill)
+      subject.should_not be_inheritable(:kill)
+      subject.should_not be_enabled
     end
   end
 
