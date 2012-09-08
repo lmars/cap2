@@ -32,8 +32,8 @@ $ sudo make install
 $ gem install cap2
 ```
 
-Usage
------
+Process and File Objects
+------------------------
 
 Cap2 provides methods for querying and modifying capabilities for both processes and files.
 
@@ -45,11 +45,18 @@ Cap2.process(1000)        # Returns a Cap2::Process for the process with pid 100
 Cap2.file('/sbin/init')   # Returns a Cap2::File for the /sbin/init file
 ```
 
+Querying Capabilities
+---------------------
+
 Capabilities are referenced using lower cased symbols, and without the CAP_ prefix (e.g. `:kill` represents CAP_KILL).
 
-### Querying Capabilities
+There are three methods defined on both `Cap2::Process` and `Cap2::File` for querying capabilities:
 
-There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each of these methods, `Cap2::File#enabled?` being the exception, take a list of capability symbols and return true / false if the capabilities are in / not in the relevant set:
+* `permitted?`
+* `enabled?`
+* `inheritable?`
+
+Each of these methods, `Cap2::File#enabled?` being the exception, take a list of capability symbols and return true / false if the capabilities are in / not in the relevant set:
 
 ```
 # the init daemon - all caps permitted & enabled but not inheritable
@@ -63,7 +70,9 @@ init.enabled?(:kill, :chown)      # => true
 
 init.inheritable?(:chown)         # => false
 init.inheritable?(:fowner, :kill) # => false
+```
 
+```
 # assume /bin/ping is using file capabilities to enable CAP_NET_RAW on exec
 ping = Cap2.file('/bin/ping')   # => #<Cap2::File @filename="/bin/ping">
 
@@ -75,15 +84,12 @@ ping.enabled?                   # => true
 ping.inheritable?(:net_raw)     # => false
 ```
 
-#### Why does Cap2::File#enabled? not take an arguement?
+### Why does Cap2::File#enabled? not take an arguement?
 
 Under the hood, the file effective set is just a single bit. When enabled, any process which exec's the file will have the capabilities from it's resulting permitted set also in it's effective set.
 
-### Modifying Capabilities
-
-Cap2 provides different levels of control over process and file capabilities.
-
-#### Files
+Modifying File Capabilities
+---------------------------
 
 The file capability modification methods are:
 
@@ -101,14 +107,16 @@ where `capabilities` can take any of the following forms:
 (:chown)
 (:mknod, :kill, :mac_admin)
 
-# hash with an `:only` key
+# hash with an :only key
 (:only => :fowner)
 (:only => [:lease, :net_raw])
 
-# hash with an `:except` key
+# hash with an :except key
 (:except => :sys_time)
 (:except => [:syslog, :fsetid])
 ```
+
+### Permitting capabilities
 
 To modify the permitted capabilities of a file (i.e. the capabilities which will be permitted in any process that exec's the file), use `Cap2::File#permit` and `Cap2::File#unpermit`:
 
@@ -128,6 +136,8 @@ file.unpermit(:chown, :fowner)           # => true
 file.permitted?(:mknod, :chown, :fowner) # => false
 ```
 
+### Enabling capabilities
+
 To modify the effective bit of a file (i.e. whether the resulting permitted capabilities of any process that exec's the file will also be enabled in it's effective set), use `Cap2::File#enable` and `Cap2::File#disable`:
 
 ```
@@ -145,6 +155,8 @@ file.disable                        # => true
 file.enabled?                       # => false
 ```
 
+### Inheriting capabilities
+
 To modify the inheritable capabilities of a file (i.e. the capabilities which will be ANDed with the inheritable set of any process that exec's the file to determine which capabilities are in the permitted set of the process), use `Cap2::File#allow_inherit` and `Cap2::File#disallow_inherit`:
 
 ```
@@ -161,7 +173,9 @@ file.disallow_inherit(:fowner)      # => true
 file.inheritable?(:fowner)          # => false
 ```
 
-To clear all capabilities for a file, use Cap2::File#clear:
+### Clearing capabilities
+
+To clear all capabilities for a file, use `Cap2::File#clear`:
 
 ```
 Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
@@ -183,7 +197,8 @@ file.inheritable?(:kill, :mknod)    # => false
 file.enabled?                       # => false
 ```
 
-#### Processes
+Modifying Process Capabilities
+------------------------------
 
 Cap2 can be used to enable / disable capabilities of the current Ruby process.
 
