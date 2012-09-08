@@ -52,14 +52,50 @@ describe Cap2::File do
   end
 
   describe '#permit' do
-    specify do
-      expect { running_as_root('permit(:fowner, :kill)') }.to \
-        change { subject.permitted?(:fowner) }.from(false).to(true)
+    context 'with a list of capability symbols' do
+      specify do
+        expect { running_as_root('permit(:fowner, :kill)') }.to \
+          change { subject.permitted?(:fowner) }.from(false).to(true)
+      end
+
+      specify do
+        expect { running_as_root('permit(:fowner, :kill)') }.to \
+          change { subject.permitted?(:kill) }.from(false).to(true)
+      end
     end
 
-    specify do
-      expect { running_as_root('permit(:fowner, :kill)') }.to \
-        change { subject.permitted?(:kill) }.from(false).to(true)
+    context 'with an :only option' do
+      specify do
+        expect { running_as_root('permit(:only => :fowner)') }.to \
+          change { subject.permitted?(:fowner) }.from(false).to(true)
+      end
+
+      specify do
+        expect { running_as_root('permit(:only => :fowner)') }.to_not \
+          change { subject.permitted?(:kill) }.from(false)
+      end
+
+      specify do
+        expect { running_as_root('permit(:only => [:fowner, :kill])') }.to \
+          change { subject.permitted?(:fowner, :kill) }.from(false).to(true)
+      end
+    end
+
+    context 'with an :except option' do
+      specify do
+        expect { running_as_root('permit(:except => :fowner)') }.to \
+          change { subject.permitted?(:kill) }.from(false).to(true)
+      end
+
+      specify do
+        expect { running_as_root('permit(:except => :fowner)') }.to_not \
+          change { subject.permitted?(:fowner) }.from(false)
+      end
+
+      specify do
+        expect { running_as_root('permit(:except => [:fowner, :kill])') }.to_not \
+          change { subject.permitted?(:fowner, :kill) }.from(false)
+      end
     end
   end
 

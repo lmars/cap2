@@ -29,25 +29,25 @@ module Cap2
 
     # Permit processes executing this file to enable the given capabilities.
     def permit(*capabilities)
-      @caps[:permitted].merge(capabilities)
+      @caps[:permitted].merge parse(capabilities)
       save
     end
 
     # Dont permit processes executing this file to enable the given capabilities.
     def unpermit(*capabilities)
-      @caps[:permitted].subtract(capabilities)
+      @caps[:permitted].subtract parse(capabilities)
       save
     end
 
     # Allow processes executing this file to inherit the given capabilities.
     def allow_inherit(*capabilities)
-      @caps[:inheritable].merge(capabilities)
+      @caps[:inheritable].merge parse(capabilities)
       save
     end
 
     # Dont allow processes executing this file to inherit the given capabilities.
     def disallow_inherit(*capabilities)
-      @caps[:inheritable].subtract(capabilities)
+      @caps[:inheritable].subtract parse(capabilities)
       save
     end
 
@@ -72,6 +72,30 @@ module Cap2
     private
     def reload
       @caps = getcaps
+    end
+
+    def parse(caps)
+      if (options = caps.first).is_a? Hash
+        if caps.size > 1
+          raise(
+            ArgumentError,
+            'cannot pass both a hash and a list of capabilities'
+          )
+        end
+
+        if options.has_key?(:only) && !options.has_key?(:except)
+          Array(options[:only])
+        elsif options.has_key?(:except) && !options.has_key?(:only)
+          Cap2.allcaps - Array(options[:except])
+        else
+          raise(
+            ArgumentError,
+            "expected exactly one of [:only, :except], got #{options.keys}"
+          )
+        end
+      else
+        caps
+      end
     end
   end
 end

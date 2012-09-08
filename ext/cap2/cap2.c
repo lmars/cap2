@@ -79,6 +79,18 @@ VALUE cap2_caps_to_hash(cap_t cap_d) {
   return caps;
 }
 
+VALUE cap2_allcaps(VALUE self) {
+  int i;
+  VALUE caps;
+
+  caps = rb_ary_new();
+
+  for(i = 0; i < __CAP_COUNT; i++)
+    rb_ary_push(caps, ID2SYM(rb_intern(cap2_caps[i].name)));
+
+  return caps;
+}
+
 /*
  * Convert @pid stored in the given Process object to an int and return it.
  */
@@ -292,6 +304,7 @@ void Init_cap2(void) {
   VALUE rb_cCap2Process;
 
   rb_mCap2 = rb_define_module("Cap2");
+  rb_define_module_function(rb_mCap2, "allcaps", cap2_allcaps, 0);
 
   rb_cCap2Process = rb_define_class_under(rb_mCap2, "Process", rb_cObject);
   rb_define_method(rb_cCap2Process, "getcaps", cap2_process_getcaps, 0);

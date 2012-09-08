@@ -85,6 +85,31 @@ Cap2 provides different levels of control over process and file capabilities.
 
 #### Files
 
+The file capability modification methods are:
+
+* `permit(capabilities)`
+* `unpermit(capabilities)`
+* `allow_inherit(capabilities)`
+* `disallow_inherit(capabilities)`
+* `enable`
+* `disable`
+
+where `capabilities` can take any of the following forms:
+
+```
+# list of one or more symbols
+(:chown)
+(:mknod, :kill, :mac_admin)
+
+# hash with an `:only` key
+(:only => :fowner)
+(:only => [:lease, :net_raw])
+
+# hash with an `:except` key
+(:except => :sys_time)
+(:except => [:syslog, :fsetid])
+```
+
 To modify the permitted capabilities of a file (i.e. the capabilities which will be permitted in any process that exec's the file), use `Cap2::File#permit` and `Cap2::File#unpermit`:
 
 ```
