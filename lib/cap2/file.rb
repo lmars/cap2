@@ -27,25 +27,25 @@ module Cap2
       !@caps[:effective].empty?
     end
 
-    # Permit processes executing this file to enable the given capability.
+    # Permit processes executing this file to enable the given capabilities.
     def permit(*capabilities)
       @caps[:permitted].merge(capabilities)
       save
     end
 
-    # Dont permit processes executing this file to enable the given capability.
+    # Dont permit processes executing this file to enable the given capabilities.
     def unpermit(*capabilities)
       @caps[:permitted].subtract(capabilities)
       save
     end
 
-    # Allow processes executing this file to inherit the given capability.
+    # Allow processes executing this file to inherit the given capabilities.
     def allow_inherit(*capabilities)
       @caps[:inheritable].merge(capabilities)
       save
     end
 
-    # Dont allow processes executing this file to inherit the given capability.
+    # Dont allow processes executing this file to inherit the given capabilities.
     def disallow_inherit(*capabilities)
       @caps[:inheritable].subtract(capabilities)
       save
