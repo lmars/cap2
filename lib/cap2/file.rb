@@ -8,16 +8,16 @@ module Cap2
       @caps     = getcaps
     end
 
-    # Returns whether the given capability is permitted
-    def permitted?(capability)
+    # Returns whether the given capabilities are permitted
+    def permitted?(*capabilities)
       reload
-      @caps[:permitted].include? capability
+      @caps[:permitted].superset? Set[*capabilities]
     end
 
-    # Returns whether the given capability is inheritable
-    def inheritable?(capability)
+    # Returns whether the given capabilities are inheritable
+    def inheritable?(*capabilities)
       reload
-      @caps[:inheritable].include? capability
+      @caps[:inheritable].superset? Set[*capabilities]
     end
 
     # Returns whether or not the file has any effective
@@ -28,26 +28,26 @@ module Cap2
     end
 
     # Permit processes executing this file to enable the given capability.
-    def permit(capability)
-      @caps[:permitted].add(capability)
+    def permit(*capabilities)
+      @caps[:permitted].merge(capabilities)
       save
     end
 
     # Dont permit processes executing this file to enable the given capability.
-    def unpermit(capability)
-      @caps[:permitted].delete(capability)
+    def unpermit(*capabilities)
+      @caps[:permitted].subtract(capabilities)
       save
     end
 
     # Allow processes executing this file to inherit the given capability.
-    def allow_inherit(capability)
-      @caps[:inheritable].add(capability)
+    def allow_inherit(*capabilities)
+      @caps[:inheritable].merge(capabilities)
       save
     end
 
     # Dont allow processes executing this file to inherit the given capability.
-    def disallow_inherit(capability)
-      @caps[:inheritable].delete(capability)
+    def disallow_inherit(*capabilities)
+      @caps[:inheritable].subtract(capabilities)
       save
     end
 

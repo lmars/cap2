@@ -49,25 +49,26 @@ Capabilities are referenced using lower cased symbols, and without the CAP_ pref
 
 ### Querying Capabilities
 
-There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each of these methods, Cap2::File#enabled? being the exception, take a capability symbol and return true / false if the capability is in / not in the relevant set:
+There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each of these methods, Cap2::File#enabled? being the exception, take a list of capability symbols and return true / false if the capabilities are in / not in the relevant set:
 
 ```
 # the init daemon - all caps permitted & enabled but not inheritable
-init = Cap2.process(1)      # => #<Cap2::Process @pid=1>
+init = Cap2.process(1)            # => #<Cap2::Process @pid=1>
 
-init.permitted?(:kill)      # => true
-init.permitted?(:chown)     # => true
+init.permitted?(:kill)            # => true
+init.permitted?(:chown, :fowner)  # => true
 
-init.enabled?(:fowner)      # => true
+init.enabled?(:fowner)            # => true
+init.enabled?(:kill, :chown)      # => true
 
-init.inheritable?(:kill)    # => false
-init.inheritable?(:fowner)  # => false
+init.inheritable?(:chown)         # => false
+init.inheritable?(:fowner, :kill) # => false
 
 # assume /bin/ping is using file capabilities to enable CAP_NET_RAW on exec
 ping = Cap2.file('/bin/ping')   # => #<Cap2::File @filename="/bin/ping">
 
 ping.permitted?(:net_raw)       # => true
-ping.permitted?(:mknod)         # => false
+ping.permitted?(:mknod, :chown) # => false
 
 ping.enabled?                   # => true
 
@@ -87,17 +88,19 @@ Cap2 provides different levels of control over process and file capabilities.
 To modify the permitted capabilities of a file (i.e. the capabilities which will be permitted in any process that exec's the file), use `Cap2::File#permit` and `Cap2::File#unpermit`:
 
 ```
-Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
+Cap2.process.enabled?(:setfcap)          # => true - needed to set file capabilities
 
-file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
+file = Cap2.file('/tmp/file')            # => #<Cap2::File @filename="/tmp/file">
 
-file.permitted?(:mknod)             # => false
+file.permitted?(:mknod, :chown, :fowner) # => false
 
-file.permit(:mknod)                 # => true
-file.permitted?(:mknod)             # => true
+file.permit(:mknod)                      # => true
+file.permit(:chown, :fowner)             # => true
+file.permitted?(:mknod, :chown, :fowner) # => true
 
-file.unpermit(:mknod)               # => true
-file.permitted?(:mknod)             # => false
+file.unpermit(:mknod)                    # => true
+file.unpermit(:chown, :fowner)           # => true
+file.permitted?(:mknod, :chown, :fowner) # => false
 ```
 
 To modify the effective bit of a file (i.e. whether the resulting permitted capabilities of any process that exec's the file will also be enabled in it's effective set), use `Cap2::File#enable` and `Cap2::File#disable`:
@@ -140,18 +143,18 @@ Cap2.process.enabled?(:setfcap)     # => true - needed to set file capabilities
 
 file = Cap2.file('/tmp/file')       # => #<Cap2::File @filename="/tmp/file">
 
-file.permit(:kill)                  # => true
-file.allow_inherit(:kill)           # => true
+file.permit(:kill, :mknod)          # => true
+file.allow_inherit(:kill, :mknod)   # => true
 file.enable                         # => true
 
-file.permitted?(:kill)              # => true
-file.inheritable?(:kill)            # => true
+file.permitted?(:kill, :mknod)      # => true
+file.inheritable?(:kill, :mknod)    # => true
 file.enabled?                       # => true
 
 file.clear                          # => true
 
-file.permitted?(:kill)              # => false
-file.inheritable?(:kill)            # => false
+file.permitted?(:kill, :mknod)      # => false
+file.inheritable?(:kill, :mknod)    # => false
 file.enabled?                       # => false
 ```
 

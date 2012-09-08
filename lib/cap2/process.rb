@@ -8,22 +8,22 @@ module Cap2
       @caps = getcaps
     end
 
-    # Returns whether the given capability is permitted
-    def permitted?(capability)
+    # Returns whether the given capabilities are permitted
+    def permitted?(*capabilities)
       reload
-      @caps[:permitted].include? capability
+      @caps[:permitted].superset? Set[*capabilities]
     end
 
-    # Returns whether the given capability is enabled
-    def enabled?(capability)
+    # Returns whether the given capabilities are enabled
+    def enabled?(*capabilities)
       reload
-      @caps[:effective].include? capability
+      @caps[:effective].superset? Set[*capabilities]
     end
 
-    # Returns whether the given capability is inheritable
-    def inheritable?(capability)
+    # Returns whether the given capabilities are inheritable
+    def inheritable?(capabilities)
       reload
-      @caps[:inheritable].include? capability
+      @caps[:inheritable].superset? Set[*capabilities]
     end
 
     # Enable the given capability for this process.

@@ -10,16 +10,16 @@ describe Cap2::File do
   end
 
   describe '#permitted?' do
-    context "when the file doesn't have the given capability" do
-      it { should_not be_permitted(:dac_override) }
+    context "when the file doesn't have the given capabilities" do
+      it { should_not be_permitted(:dac_override, :chown) }
     end
 
-    context 'when the file does have the given capability' do
+    context 'when the file does have the given capabilities' do
       before(:each) do
-        run_as_root('permit(:dac_override)')
+        run_as_root('permit(:dac_override, :chown)')
       end
 
-      it { should be_permitted(:dac_override) }
+      it { should be_permitted(:dac_override, :chown) }
     end
   end
 
@@ -38,34 +38,44 @@ describe Cap2::File do
   end
 
   describe '#inheritable?' do
-    context "when the file doesn't have the given capability" do
-      it { should_not be_inheritable(:dac_override) }
+    context "when the file doesn't have the given capabilities" do
+      it { should_not be_inheritable(:dac_override, :chown) }
     end
 
-    context 'when the file does have the given capability' do
+    context 'when the file does have the given capabilities' do
       before(:each) do
-        run_as_root('allow_inherit(:dac_override)')
+        run_as_root('allow_inherit(:dac_override, :chown)')
       end
 
-      it { should be_inheritable(:dac_override) }
+      it { should be_inheritable(:dac_override, :chown) }
     end
   end
 
   describe '#permit' do
     specify do
-      expect { running_as_root('permit(:fowner)') }.to \
+      expect { running_as_root('permit(:fowner, :kill)') }.to \
         change { subject.permitted?(:fowner) }.from(false).to(true)
+    end
+
+    specify do
+      expect { running_as_root('permit(:fowner, :kill)') }.to \
+        change { subject.permitted?(:kill) }.from(false).to(true)
     end
   end
 
   describe '#unpermit' do
     before(:each) do
-      run_as_root('permit(:fowner)')
+      run_as_root('permit(:fowner, :kill)')
     end
 
     specify do
-      expect { running_as_root('unpermit(:fowner)') }.to \
+      expect { running_as_root('unpermit(:fowner, :kill)') }.to \
         change { subject.permitted?(:fowner) }.from(true).to(false)
+    end
+
+    specify do
+      expect { running_as_root('unpermit(:fowner, :kill)') }.to \
+        change { subject.permitted?(:kill) }.from(true).to(false)
     end
   end
 
