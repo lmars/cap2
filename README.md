@@ -49,7 +49,7 @@ Capabilities are referenced using lower cased symbols, and without the CAP_ pref
 
 ### Querying Capabilities
 
-There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each of these methods, Cap2::File#enabled? being the exception, take a list of capability symbols and return true / false if the capabilities are in / not in the relevant set:
+There are three methods - `permitted?`, `enabled?` and `inheritable?` - defined on both `Cap2::Process` and `Cap2::File` for querying capabilities. Each of these methods, `Cap2::File#enabled?` being the exception, take a list of capability symbols and return true / false if the capabilities are in / not in the relevant set:
 
 ```
 # the init daemon - all caps permitted & enabled but not inheritable
