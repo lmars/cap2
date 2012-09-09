@@ -6,7 +6,8 @@ describe Cap2::File do
   subject { Cap2::File.new(file.path) }
 
   before(:each) do
-    run_as_root('clear')
+    Cap2.process.enable(:setfcap)
+    subject.clear
   end
 
   describe '#permitted?' do
@@ -16,7 +17,7 @@ describe Cap2::File do
 
     context 'when the file does have the given capabilities' do
       before(:each) do
-        run_as_root('permit(:dac_override, :chown)')
+        subject.permit(:dac_override, :chown)
       end
 
       it { should be_permitted(:dac_override, :chown) }
@@ -30,7 +31,8 @@ describe Cap2::File do
 
     context "when the file's enabled bit is set" do
       before(:each) do
-        run_as_root('permit(:dac_override)', 'enable')
+        subject.permit(:dac_override)
+        subject.enable
       end
 
       it { should be_enabled }
@@ -44,7 +46,7 @@ describe Cap2::File do
 
     context 'when the file does have the given capabilities' do
       before(:each) do
-        run_as_root('allow_inherit(:dac_override, :chown)')
+        subject.allow_inherit(:dac_override, :chown)
       end
 
       it { should be_inheritable(:dac_override, :chown) }
@@ -54,46 +56,46 @@ describe Cap2::File do
   describe '#permit' do
     context 'with a list of capability symbols' do
       specify do
-        expect { running_as_root('permit(:fowner, :kill)') }.to \
+        expect { subject.permit(:fowner, :kill) }.to \
           change { subject.permitted?(:fowner) }.from(false).to(true)
       end
 
       specify do
-        expect { running_as_root('permit(:fowner, :kill)') }.to \
+        expect { subject.permit(:fowner, :kill) }.to \
           change { subject.permitted?(:kill) }.from(false).to(true)
       end
     end
 
     context 'with an :only option' do
       specify do
-        expect { running_as_root('permit(:only => :fowner)') }.to \
+        expect { subject.permit(:only => :fowner) }.to \
           change { subject.permitted?(:fowner) }.from(false).to(true)
       end
 
       specify do
-        expect { running_as_root('permit(:only => :fowner)') }.to_not \
+        expect { subject.permit(:only => :fowner) }.to_not \
           change { subject.permitted?(:kill) }.from(false)
       end
 
       specify do
-        expect { running_as_root('permit(:only => [:fowner, :kill])') }.to \
+        expect { subject.permit(:only => [:fowner, :kill]) }.to \
           change { subject.permitted?(:fowner, :kill) }.from(false).to(true)
       end
     end
 
     context 'with an :except option' do
       specify do
-        expect { running_as_root('permit(:except => :fowner)') }.to \
+        expect { subject.permit(:except => :fowner) }.to \
           change { subject.permitted?(:kill) }.from(false).to(true)
       end
 
       specify do
-        expect { running_as_root('permit(:except => :fowner)') }.to_not \
+        expect { subject.permit(:except => :fowner) }.to_not \
           change { subject.permitted?(:fowner) }.from(false)
       end
 
       specify do
-        expect { running_as_root('permit(:except => [:fowner, :kill])') }.to_not \
+        expect { subject.permit(:except => [:fowner, :kill]) }.to_not \
           change { subject.permitted?(:fowner, :kill) }.from(false)
       end
     end
@@ -101,34 +103,34 @@ describe Cap2::File do
 
   describe '#unpermit' do
     before(:each) do
-      run_as_root('permit(:fowner, :kill)')
+      subject.permit(:fowner, :kill)
     end
 
     specify do
-      expect { running_as_root('unpermit(:fowner, :kill)') }.to \
+      expect { subject.unpermit(:fowner, :kill) }.to \
         change { subject.permitted?(:fowner) }.from(true).to(false)
     end
 
     specify do
-      expect { running_as_root('unpermit(:fowner, :kill)') }.to \
+      expect { subject.unpermit(:fowner, :kill) }.to \
         change { subject.permitted?(:kill) }.from(true).to(false)
     end
   end
 
   describe '#allow_inherit' do
     specify do
-      expect { running_as_root('allow_inherit(:chown)') }.to \
+      expect { subject.allow_inherit(:chown) }.to \
         change { subject.inheritable?(:chown) }.from(false).to(true)
     end
   end
 
   describe '#disallow_inherit' do
     before(:each) do
-      run_as_root('allow_inherit(:chown)')
+      subject.allow_inherit(:chown)
     end
 
     specify do
-      expect { running_as_root('disallow_inherit(:chown)') }.to \
+      expect { subject.disallow_inherit(:chown) }.to \
         change { subject.inheritable?(:chown) }.from(true).to(false)
     end
   end
@@ -136,23 +138,23 @@ describe Cap2::File do
   context 'enabling and disabling' do
     context 'when at least one capability is permitted' do
       before(:each) do
-        run_as_root('permit(:kill)')
+        subject.permit(:kill)
       end
 
       describe '#enable' do
         specify do
-          expect { running_as_root('enable') }.to \
+          expect { subject.enable }.to \
             change { subject.enabled? }.from(false).to(true)
         end
       end
 
       describe '#disable' do
         before(:each) do
-          run_as_root('enable')
+          subject.enable
         end
 
         specify do
-          expect { running_as_root('disable') }.to \
+          expect { subject.disable }.to \
             change { subject.enabled? }.from(true).to(false)
         end
       end
@@ -161,18 +163,18 @@ describe Cap2::File do
     context 'when no capabilities are permitted or inheritable' do
       describe '#enable' do
         specify do
-          expect { running_as_root('enable') }.to_not \
+          expect { subject.enable }.to_not \
             change { subject.enabled? }.from(false)
         end
       end
 
       describe '#disable' do
         before(:each) do
-          run_as_root('enable')
+          subject.enable
         end
 
         specify do
-          expect { running_as_root('disable') }.to_not \
+          expect { subject.disable }.to_not \
             change { subject.enabled? }.from(false)
         end
       end
@@ -181,23 +183,15 @@ describe Cap2::File do
 
   describe '#clear' do
     it 'should clear all capabilities' do
-      run_as_root('permit(:kill)', 'allow_inherit(:kill)', 'enable')
+      subject.permit(:kill)
+      subject.allow_inherit(:kill)
+      subject.enable
 
-      run_as_root('clear')
+      subject.clear
 
       subject.should_not be_permitted(:kill)
       subject.should_not be_inheritable(:kill)
       subject.should_not be_enabled
     end
   end
-
-  # FIXME: Would like to call the given code on subject directly (e.g.
-  #        `subject.permit(:fowner)`) but this would require the test
-  #        suite to be run as root?
-  def run_as_root(*codes)
-    codes.each do |code|
-      system %{sudo ruby -Ilib -rcap2 -e 'Cap2.file("#{file.path}").#{code}'}
-    end
-  end
-  alias running_as_root run_as_root
 end
